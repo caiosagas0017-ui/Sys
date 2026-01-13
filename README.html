@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestão de Compras</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Configurações do Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            900: '#0c4a6e',
+                        },
+                        dark: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'glow': '0 0 15px rgba(14, 165, 233, 0.3)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Table Floating Rows Style */
+        .table-spacing {
+            border-collapse: separate;
+            border-spacing: 0 8px;
+        }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-600 h-screen flex flex-col overflow-hidden">
+
+    <!-- TELA DE LOGIN (BLOQUEIO) -->
+    <div id="login-screen" class="fixed inset-0 bg-slate-900 z-[100] flex items-center justify-center p-4">
+        <div class="bg-white p-8 md:p-10 rounded-3xl shadow-2xl w-full max-w-md text-center transform transition-all scale-100">
+            <div class="w-20 h-20 bg-brand-50 text-brand-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-glow">
+                <i class="fa-solid fa-lock text-3xl"></i>
+            </div>
+            <h2 class="text-3xl font-bold text-slate-800 mb-2">Acesso Restrito</h2>
+            <p class="text-slate-500 mb-8">Por favor, identifique-se para continuar.</p>
+            
+            <form onsubmit="attemptLogin(event)" class="space-y-4">
+                <div class="relative">
+                    <input type="password" id="login-password" placeholder="Senha de Acesso" class="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-brand-100 focus:border-brand-500 outline-none text-center font-bold tracking-widest text-xl transition-all placeholder:font-normal placeholder:tracking-normal placeholder:text-slate-400">
+                    <i class="fa-solid fa-key absolute right-5 top-5 text-slate-400"></i>
+                </div>
+                
+                <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-brand-500/30 hover:shadow-brand-500/50 hover:-translate-y-0.5 active:translate-y-0 text-lg">
+                    Entrar no Sistema
+                </button>
+            </form>
+            
+            <p id="login-error" class="text-red-500 text-sm mt-6 hidden font-medium bg-red-50 py-2 rounded-lg border border-red-100 animate-pulse">
+                <i class="fa-solid fa-circle-xmark mr-1"></i> Senha incorreta. Tente novamente.
+            </p>
+            
+            <p class="text-slate-300 text-xs mt-8">SysCompras v1.4 • Segurança Ativa</p>
+        </div>
+    </div>
+
+    <!-- Header Principal -->
+    <header class="fixed top-0 w-full bg-white/90 backdrop-blur-md border-b border-gray-200 z-30 flex justify-between items-center px-6 py-3 shadow-sm">
+        <div class="flex items-center gap-4">
+            <button onclick="toggleSidebar()" class="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-brand-600 hover:bg-brand-50 rounded-xl transition-all">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
+            
+            <div class="flex items-center gap-2">
+                <div class="bg-brand-600 text-white w-8 h-8 rounded-lg flex items-center justify-center text-sm shadow-glow">
+                    <i class="fa-solid fa-boxes-packing"></i>
+                </div>
+                <span class="font-bold text-slate-800 text-lg tracking-tight">SysCompras <span class="text-xs font-normal text-gray-400 ml-1">Pro</span></span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+             <div class="text-right hidden sm:block">
+                <p class="text-sm font-bold text-slate-700" id="header-date">--/--/----</p>
+                <p class="text-xs text-brand-600 font-medium" id="header-time">00:00</p>
+            </div>
+            <div class="h-8 w-px bg-gray-200 hidden sm:block"></div>
+            <div class="w-9 h-9 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400">
+                <i class="fa-solid fa-user"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar (Gaveta Deslizante) -->
+    <aside id="main-sidebar" class="fixed inset-y-0 left-0 w-72 bg-white border-r border-gray-200 z-40 transform -translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
+        <div class="p-6 flex justify-between items-center border-b border-gray-100 bg-slate-50">
+            <h2 class="text-lg font-bold text-slate-700 tracking-tight">Navegação</h2>
+            <button onclick="toggleSidebar()" class="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-400 hover:text-red-500 hover:border-red-200 transition-colors">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <nav class="flex-1 px-4 space-y-1 mt-6">
+            <p class="px-4 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Gestão</p>
+            <button onclick="showPage('dashboard'); toggleSidebar()" id="nav-dashboard" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-left rounded-xl transition-all duration-200 group text-slate-600 hover:bg-slate-50 border border-transparent">
+                <i class="fa-solid fa-chart-pie w-5 group-hover:text-brand-600 transition-colors"></i> <span class="font-medium">Visão Geral</span>
+            </button>
+            <button onclick="showPage('orders'); toggleSidebar()" id="nav-orders" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-left rounded-xl transition-all duration-200 group text-slate-600 hover:bg-slate-50 border border-transparent">
+                <i class="fa-solid fa-list-check w-5 group-hover:text-brand-600 transition-colors"></i> <span class="font-medium">Ordens de Compra</span>
+            </button>
+            <button onclick="showPage('reminders'); toggleSidebar()" id="nav-reminders" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-left rounded-xl transition-all duration-200 group text-slate-600 hover:bg-slate-50 border border-transparent">
+                <i class="fa-solid fa-bell w-5 group-hover:text-brand-600 transition-colors"></i> <span class="font-medium">Lembretes</span>
+            </button>
+            
+            <p class="px-4 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 mt-6">Sistema</p>
+            <button onclick="showPage('settings'); toggleSidebar()" id="nav-settings" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-left rounded-xl transition-all duration-200 group text-slate-600 hover:bg-slate-50 border border-transparent">
+                <i class="fa-solid fa-gear w-5 group-hover:text-brand-600 transition-colors"></i> <span class="font-medium">Configurações</span>
+            </button>
+        </nav>
+
+        <div class="p-4 bg-slate-50 border-t border-gray-200">
+            <div class="bg-brand-50 rounded-lg p-3 border border-brand-100">
+                <p class="text-xs text-brand-700 font-medium mb-1"><i class="fa-solid fa-circle-info mr-1"></i> Status do Sistema</p>
+                <p class="text-[10px] text-brand-600/70">Todos os serviços operacionais.</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Overlay -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-[2px] z-30 hidden transition-opacity" onclick="toggleSidebar()"></div>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto pt-20 pb-8 bg-[#F8FAFC] relative scroll-smooth w-full">
+        
+        <!-- DASHBOARD PAGE -->
+        <div id="page-dashboard" class="px-6 md:px-8 max-w-[1600px] mx-auto fade-in">
+            
+            <!-- Welcome Header & Quick Actions -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 mt-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800" id="welcome-msg">Bom dia, Admin</h2>
+                    <p class="text-slate-500 text-sm mt-1">Aqui está o panorama das suas aquisições hoje.</p>
+                </div>
+                
+                <div class="flex gap-3 overflow-x-auto pb-2 md:pb-0">
+                    <button onclick="newOrder()" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-lg shadow-slate-200 whitespace-nowrap">
+                        <i class="fa-solid fa-plus"></i> Nova Ordem
+                    </button>
+                    <button onclick="openModal('modal-reminder')" class="flex items-center gap-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap">
+                        <i class="fa-regular fa-note-sticky"></i> Anotar Lembrete
+                    </button>
+                </div>
+            </div>
+
+            <!-- KPI Cards Row -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                <!-- Card 2: Entregues -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm group hover:border-emerald-200 transition-colors">
+                    <div class="flex justify-between items-start mb-2">
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Concluídas</p>
+                        <i class="fa-solid fa-check-circle text-emerald-500 bg-emerald-50 p-2 rounded-lg"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-800" id="kpi-delivered">0</h3>
+                    <div class="w-full bg-slate-100 h-1.5 mt-3 rounded-full overflow-hidden">
+                        <div id="bar-delivered" class="h-full bg-emerald-500 rounded-full" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Aguardando -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm group hover:border-amber-200 transition-colors">
+                    <div class="flex justify-between items-start mb-2">
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Em Aberto</p>
+                        <i class="fa-solid fa-clock text-amber-500 bg-amber-50 p-2 rounded-lg"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-800" id="kpi-waiting">0</h3>
+                     <div class="w-full bg-slate-100 h-1.5 mt-3 rounded-full overflow-hidden">
+                        <div id="bar-waiting" class="h-full bg-amber-500 rounded-full" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Card 4: Assinatura -->
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm group hover:border-indigo-200 transition-colors">
+                    <div class="flex justify-between items-start mb-2">
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Assinatura</p>
+                        <i class="fa-solid fa-file-signature text-indigo-500 bg-indigo-50 p-2 rounded-lg"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-800" id="kpi-signing">0</h3>
+                     <div class="w-full bg-slate-100 h-1.5 mt-3 rounded-full overflow-hidden">
+                        <div id="bar-signing" class="h-full bg-indigo-500 rounded-full" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Dashboard Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- Coluna Principal (2/3) -->
+                <div class="lg:col-span-2 space-y-6">
+                    
+                    <!-- Próximas Entregas -->
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                            <h3 class="font-bold text-slate-700 flex items-center gap-2">
+                                <i class="fa-solid fa-truck-fast text-brand-500"></i> Próximas Entregas
+                            </h3>
+                            <span class="text-xs font-medium bg-brand-100 text-brand-700 px-2 py-1 rounded">Próximos 7 dias</span>
+                        </div>
+                        <div class="p-0">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm">
+                                    <thead class="bg-slate-50 text-xs uppercase text-slate-400 font-semibold">
+                                        <tr>
+                                            <th class="px-6 py-3">Data</th>
+                                            <th class="px-6 py-3">Fornecedor</th>
+                                            <th class="px-6 py-3">Produto</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="upcoming-deliveries-body" class="divide-y divide-slate-100">
+                                        <!-- Filled by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="upcoming-empty" class="hidden py-8 text-center text-slate-400 text-sm">
+                                Nenhuma entrega prevista para esta semana.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lembretes Rápidos -->
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                            <h3 class="font-bold text-slate-700 flex items-center gap-2">
+                                <i class="fa-regular fa-bell text-purple-500"></i> Lembretes Prioritários
+                            </h3>
+                            <button onclick="showPage('reminders')" class="text-xs text-brand-600 hover:underline">Ver todos</button>
+                        </div>
+                        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4" id="dashboard-reminders-list">
+                            <!-- Filled by JS -->
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Coluna Lateral (1/3) -->
+                <div class="space-y-6">
+                    <!-- Resumo Status -->
+                    <div class="bg-slate-800 text-white p-6 rounded-xl shadow-lg relative overflow-hidden">
+                        <div class="relative z-10">
+                            <h3 class="font-bold text-lg mb-1">Status Geral</h3>
+                            <p class="text-slate-400 text-xs mb-6">Proporção de pedidos</p>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="text-emerald-400">Entregue</span>
+                                        <span id="stat-perc-delivered">0%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-700 rounded-full h-2">
+                                        <div id="stat-bar-delivered" class="bg-emerald-500 h-2 rounded-full" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="text-amber-400">Aguardando</span>
+                                        <span id="stat-perc-waiting">0%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-700 rounded-full h-2">
+                                        <div id="stat-bar-waiting" class="bg-amber-500 h-2 rounded-full" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="text-indigo-400">Assinatura</span>
+                                        <span id="stat-perc-signing">0%</span>
+                                    </div>
+                                    <div class="w-full bg-slate-700 rounded-full h-2">
+                                        <div id="stat-bar-signing" class="bg-indigo-500 h-2 rounded-full" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Decorative Circle -->
+                        <div class="absolute -top-10 -right-10 w-40 h-40 bg-slate-700 rounded-full opacity-30 blur-2xl"></div>
+                        <div class="absolute bottom-0 left-0 w-20 h-20 bg-brand-500 rounded-full opacity-10 blur-xl"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ORDERS PAGE (MODERNIZED) -->
+        <div id="page-orders" class="px-6 md:px-8 max-w-[1600px] mx-auto hidden fade-in">
+            <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 mt-4">
+                <div>
+                    <h2 class="text-3xl font-bold text-slate-800">Ordens de Compra</h2>
+                    <p class="text-slate-500 mt-1">Gerencie suas requisições e prazos.</p>
+                </div>
+                <button onclick="newOrder()" class="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-xl shadow-lg shadow-slate-200 hover:shadow-xl transition-all flex items-center gap-2 font-medium">
+                    <i class="fa-solid fa-plus"></i> Nova Ordem
+                </button>
+            </header>
+
+            <!-- Modern Filters -->
+            <div class="bg-white p-2 rounded-xl border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row gap-2">
+                <div class="flex-1 relative">
+                    <i class="fa-solid fa-search absolute left-4 top-3.5 text-slate-400"></i>
+                    <input type="text" id="search-order" onkeyup="filterOrders()" placeholder="Buscar fornecedor, produto..." class="w-full pl-11 pr-4 py-3 rounded-lg border-none focus:ring-0 text-slate-700 placeholder-slate-400 font-medium bg-transparent">
+                </div>
+                <div class="h-auto w-px bg-slate-200 hidden md:block my-2"></div>
+                <select id="filter-status" onchange="filterOrders()" class="p-3 px-4 rounded-lg border-none focus:ring-0 bg-transparent font-medium text-slate-600 cursor-pointer hover:bg-slate-50 transition-colors">
+                    <option value="all">Todos os Status</option>
+                    <option value="entregue">Entregue</option>
+                    <option value="aguardando">Aguardando</option>
+                    <option value="assinatura">Assinatura</option>
+                </select>
+            </div>
+
+            <!-- Desktop View (Table) -->
+            <div class="hidden md:block overflow-x-auto pb-4">
+                <table class="w-full table-spacing">
+                    <thead>
+                        <tr class="text-xs uppercase text-slate-400 font-bold tracking-wider text-left">
+                            <th class="pb-4 pl-6">Ordem</th>
+                            <th class="pb-4">Fornecedor</th>
+                            <th class="pb-4">Produto</th>
+                            <th class="pb-4">Entrega</th>
+                            <th class="pb-4">Status</th>
+                            <th class="pb-4 pr-6 text-right">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-desktop-body" class="text-sm">
+                        <!-- JS Generated -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobile View (Cards) -->
+            <div class="md:hidden grid grid-cols-1 gap-4 pb-4" id="orders-mobile-grid">
+                <!-- JS Generated -->
+            </div>
+
+            <div id="empty-state" class="hidden py-16 text-center">
+                <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
+                    <i class="fa-solid fa-search text-3xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800">Nenhum resultado</h3>
+                <p class="text-slate-500">Tente ajustar seus filtros de busca.</p>
+            </div>
+        </div>
+
+        <!-- REMINDERS PAGE -->
+        <div id="page-reminders" class="px-6 md:px-8 max-w-[1600px] mx-auto hidden fade-in">
+            <header class="mb-10 flex justify-between items-center mt-4">
+                <div>
+                    <h2 class="text-3xl font-bold text-slate-800">Lembretes</h2>
+                    <p class="text-slate-500 mt-1">Tarefas e prazos importantes.</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="requestNotificationPermission()" class="w-12 h-12 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 flex items-center justify-center transition-colors shadow-sm group relative" title="Ativar Alertas">
+                        <i class="fa-solid fa-bell text-xl"></i>
+                        <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full hidden" id="notification-dot"></span>
+                    </button>
+                    <button onclick="openModal('modal-reminder')" class="w-12 h-12 rounded-xl bg-purple-100 text-purple-600 hover:bg-purple-200 flex items-center justify-center transition-colors shadow-sm">
+                        <i class="fa-solid fa-plus text-xl"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="reminders-grid">
+                <!-- JS Generated -->
+            </div>
+            
+            <div id="reminders-empty" class="hidden flex flex-col items-center justify-center py-20 opacity-50">
+                 <i class="fa-solid fa-clipboard-check text-6xl text-slate-300 mb-4"></i>
+                 <p class="text-slate-500 font-medium">Tudo limpo por aqui!</p>
+            </div>
+        </div>
+
+        <!-- SETTINGS PAGE (NOVO) -->
+        <div id="page-settings" class="px-6 md:px-8 max-w-4xl mx-auto hidden fade-in">
+            <header class="mb-10 mt-4">
+                <h2 class="text-3xl font-bold text-slate-800">Configurações</h2>
+                <p class="text-slate-500 mt-1">Gerencie seus dados e preferências do sistema.</p>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Backup Card -->
+                <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center text-center">
+                    <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-6">
+                        <i class="fa-solid fa-cloud-arrow-down text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">Fazer Backup</h3>
+                    <p class="text-slate-500 text-sm mb-8 flex-1">Exporte todos os seus dados (Ordens e Lembretes) para um arquivo seguro. Recomendado semanalmente.</p>
+                    <button onclick="exportData()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-xl transition-colors flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-download"></i> Exportar Dados
+                    </button>
+                </div>
+
+                <!-- Restore Card -->
+                <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center text-center">
+                    <div class="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mb-6">
+                        <i class="fa-solid fa-cloud-arrow-up text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">Restaurar Dados</h3>
+                    <p class="text-slate-500 text-sm mb-8 flex-1">Recupere seus dados a partir de um arquivo de backup (.json). Isso substituirá os dados atuais.</p>
+                    <label class="w-full cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 px-6 rounded-xl transition-colors flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-upload"></i> Selecionar Arquivo
+                        <input type="file" accept=".json" onchange="importData(event)" class="hidden">
+                    </label>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- MODAL ORDER -->
+    <div id="modal-order" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden transform scale-100 transition-transform">
+            <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-slate-50">
+                <h3 id="modal-title" class="font-bold text-xl text-slate-800">Ordem de Compra</h3>
+                <button onclick="closeModal('modal-order')" class="w-8 h-8 rounded-full hover:bg-gray-200 flex items-center justify-center text-slate-500 transition-colors"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <form id="form-order" onsubmit="saveOrder(event)" class="p-8 space-y-6">
+                <input type="hidden" id="order-id">
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nº Ordem</label>
+                        <input type="text" id="order-num" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Hora Criação</label>
+                        <input type="time" id="order-creation-time" readonly class="w-full px-4 py-3 bg-slate-100 border border-slate-200 rounded-lg text-slate-500 font-medium cursor-not-allowed">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Data Entrega</label>
+                        <input type="date" id="order-date" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium text-slate-600">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Fornecedor</label>
+                        <input type="text" id="order-supplier" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Situação Atual</label>
+                        <div class="relative">
+                            <select id="order-status" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium appearance-none">
+                                <option value="aguardando">Aguardando</option>
+                                <option value="assinatura">Em Assinatura</option>
+                                <option value="entregue">Entregue</option>
+                            </select>
+                            <i class="fa-solid fa-chevron-down absolute right-4 top-4 text-slate-400 text-xs pointer-events-none"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Produto / Serviço</label>
+                    <input type="text" id="order-product" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium">
+                </div>
+
+                <div class="pt-4 flex justify-end gap-3 border-t border-slate-100">
+                    <button type="button" onclick="closeModal('modal-order')" class="px-6 py-2.5 text-slate-600 hover:bg-slate-100 rounded-lg font-medium transition-colors">Cancelar</button>
+                    <button type="submit" id="btn-save-order" class="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg shadow-lg shadow-slate-200 hover:shadow-xl font-medium transition-all">Salvar Ordem</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL REMINDER -->
+    <div id="modal-reminder" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div class="px-8 py-6 border-b border-purple-50 bg-purple-50/50 flex justify-between items-center">
+                <h3 class="font-bold text-xl text-purple-900">Novo Lembrete</h3>
+                <button onclick="closeModal('modal-reminder')" class="text-purple-800/50 hover:text-purple-800 transition-colors"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <form id="form-reminder" onsubmit="saveReminder(event)" class="p-8 space-y-5">
+                <div>
+                    <label class="block text-xs font-bold text-purple-700/70 uppercase tracking-wider mb-2">Nota</label>
+                    <textarea id="reminder-text" rows="3" required class="w-full px-4 py-3 bg-purple-50/30 border border-purple-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-purple-400/30 focus:border-purple-400 outline-none transition-all font-medium resize-none placeholder-purple-400/50 text-purple-900" placeholder="Ex: Renovar contrato..."></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-purple-700/70 uppercase tracking-wider mb-2">Prazo</label>
+                    <input type="date" id="reminder-date" class="w-full px-4 py-3 bg-purple-50/30 border border-purple-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-purple-400/30 focus:border-purple-400 outline-none transition-all font-medium text-purple-800">
+                </div>
+                <div class="pt-4 flex justify-end gap-3">
+                    <button type="button" onclick="closeModal('modal-reminder')" class="px-6 py-2.5 text-slate-500 hover:bg-slate-50 rounded-lg font-medium transition-colors">Cancelar</button>
+                    <button type="submit" class="px-6 py-2.5 bg-purple-500 hover:bg-purple-400 text-white rounded-lg shadow-lg shadow-purple-500/30 font-medium transition-all">Criar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DELETE CONFIRMATION -->
+    <div id="modal-delete" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden p-8 text-center">
+            <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fa-regular fa-trash-can text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-2">Excluir Item?</h3>
+            <p class="text-slate-500 text-sm mb-8 leading-relaxed">Você tem certeza que deseja remover este item? Esta ação é irreversível.</p>
+            
+            <div class="flex gap-3 justify-center">
+                <button onclick="closeModal('modal-delete')" class="px-5 py-2.5 text-slate-600 hover:bg-slate-100 rounded-lg font-medium transition-colors">Cancelar</button>
+                <button onclick="confirmDelete()" class="px-6 py-2.5 bg-red-500 hover:bg-red-600 text-white rounded-lg shadow-lg hover:shadow-red-500/30 font-medium transition-all">Sim, Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA STATE ---
+        let orders = JSON.parse(localStorage.getItem('sys_orders')) || [];
+        let reminders = JSON.parse(localStorage.getItem('sys_reminders')) || [];
+        let pendingDeleteId = null;
+
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderOrders();
+            renderReminders();
+            updateDashboard();
+            updateDateTime();
+            
+            // Check notifications on load
+            if (Notification.permission === "granted") {
+                checkReminders();
+            } else if (Notification.permission !== "denied") {
+                document.getElementById('notification-dot').classList.remove('hidden');
+            }
+
+            // Periodic updates
+            setInterval(updateDateTime, 60000); 
+            setInterval(checkReminders, 60000); // Check reminders every minute
+        });
+
+        // --- LOGIN LOGIC ---
+        function attemptLogin(e) {
+            e.preventDefault();
+            const pass = document.getElementById('login-password').value;
+            const errorMsg = document.getElementById('login-error');
+            
+            if(pass === '1234') {
+                document.getElementById('login-screen').classList.add('hidden');
+                // Opcional: Adicionar lógica para manter sessão, se necessário
+            } else {
+                errorMsg.classList.remove('hidden');
+                document.getElementById('login-password').value = '';
+                document.getElementById('login-password').focus();
+                
+                // Hide error after 3 seconds
+                setTimeout(() => {
+                    errorMsg.classList.add('hidden');
+                }, 3000);
+            }
+        }
+
+        // --- BACKUP & RESTORE LOGIC ---
+        function exportData() {
+            const data = {
+                orders: orders,
+                reminders: reminders,
+                timestamp: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(data, null, 2);
+            const blob = new Blob([dataStr], {type: "application/json"});
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `backup_syscompras_${new Date().toISOString().slice(0,10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const content = e.target.result;
+                    const parsedData = JSON.parse(content);
+
+                    if (parsedData.orders && Array.isArray(parsedData.orders)) {
+                        if(confirm('Isso substituirá todos os dados atuais. Deseja continuar?')) {
+                            orders = parsedData.orders;
+                            reminders = parsedData.reminders || [];
+                            saveData();
+                            renderOrders();
+                            renderReminders();
+                            updateDashboard();
+                            alert('Backup restaurado com sucesso!');
+                        }
+                    } else {
+                        alert('Arquivo de backup inválido.');
+                    }
+                } catch (error) {
+                    console.error(error);
+                    alert('Erro ao ler o arquivo. Verifique se é um JSON válido.');
+                }
+                // Clear input to allow re-uploading same file if needed
+                event.target.value = '';
+            };
+            reader.readAsText(file);
+        }
+
+        // --- NOTIFICATIONS ---
+        function requestNotificationPermission() {
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    document.getElementById('notification-dot').classList.add('hidden');
+                    new Notification("SysCompras", { body: "Notificações ativadas com sucesso!" });
+                    checkReminders();
+                } else {
+                    alert("Para receber alertas, você precisa permitir notificações nas configurações do navegador.");
+                }
+            });
+        }
+
+        function checkReminders() {
+            if (Notification.permission !== "granted") return;
+            
+            const today = new Date().toISOString().split('T')[0];
+            
+            reminders.forEach(r => {
+                // If reminder is for today, not done, and not notified yet
+                if (!r.done && r.date === today && !r.notified) {
+                    new Notification("Lembrete SysCompras", {
+                        body: r.text,
+                        icon: "https://cdn-icons-png.flaticon.com/512/1792/1792931.png"
+                    });
+                    
+                    // Mark as notified to avoid spamming
+                    r.notified = true; 
+                    saveData(); // Save the notified state
+                }
+            });
+        }
+
+        // --- CLOCK & GREETING ---
+        function updateDateTime() {
+            const now = new Date();
+            
+            // Date
+            const dateOptions = { day: 'numeric', month: 'numeric', year: 'numeric' };
+            document.getElementById('header-date').innerText = now.toLocaleDateString('pt-BR', dateOptions);
+            
+            // Time
+            const timeOptions = { hour: '2-digit', minute: '2-digit' };
+            document.getElementById('header-time').innerText = now.toLocaleTimeString('pt-BR', timeOptions);
+
+            // Greeting
+            const hour = now.getHours();
+            let greeting = 'Bom dia';
+            if (hour >= 12 && hour < 18) greeting = 'Boa tarde';
+            else if (hour >= 18) greeting = 'Boa noite';
+            
+            const welcome = document.getElementById('welcome-msg');
+            if(welcome) welcome.innerText = `${greeting}, Admin`;
+        }
+
+        // --- NAVIGATION ---
+        function toggleSidebar() {
+            const sidebar = document.getElementById('main-sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('opacity-0');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+            }
+        }
+
+        function showPage(pageId) {
+            ['dashboard', 'orders', 'reminders', 'settings'].forEach(id => {
+                const page = document.getElementById(`page-${id}`);
+                if (page) page.classList.add('hidden');
+                
+                const navBtn = document.getElementById(`nav-${id}`);
+                if(navBtn) {
+                    if (id === pageId) {
+                        navBtn.classList.add('bg-slate-50', 'text-brand-600', 'border-brand-200');
+                        navBtn.classList.remove('text-slate-600', 'border-transparent');
+                    } else {
+                        navBtn.classList.remove('bg-slate-50', 'text-brand-600', 'border-brand-200');
+                        navBtn.classList.add('text-slate-600', 'border-transparent');
+                    }
+                }
+            });
+
+            const targetPage = document.getElementById(`page-${pageId}`);
+            if (targetPage) targetPage.classList.remove('hidden');
+            
+            if (pageId === 'dashboard') updateDashboard();
+        }
+
+        // --- MODALS ---
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+            if(id === 'modal-reminder') document.getElementById('form-reminder').reset();
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+            if (id === 'modal-delete') pendingDeleteId = null;
+        }
+
+        // --- ORDER LOGIC ---
+        function newOrder() {
+            document.getElementById('form-order').reset();
+            document.getElementById('order-id').value = '';
+            document.getElementById('modal-title').innerText = 'Nova Ordem';
+            document.getElementById('btn-save-order').innerText = 'Salvar Ordem';
+            
+            // Set current time automatically
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('order-creation-time').value = timeStr;
+            
+            openModal('modal-order');
+        }
+
+        function saveOrder(e) {
+            e.preventDefault();
+            const id = document.getElementById('order-id').value;
+            
+            const orderData = {
+                id: id ? parseInt(id) : Date.now(),
+                number: document.getElementById('order-num').value,
+                creationTime: document.getElementById('order-creation-time').value, // Save time
+                supplier: document.getElementById('order-supplier').value,
+                product: document.getElementById('order-product').value,
+                date: document.getElementById('order-date').value,
+                status: document.getElementById('order-status').value,
+                timestamp: Date.now()
+            };
+
+            if (id) {
+                const index = orders.findIndex(o => o.id == id);
+                // Keep original creation time if editing
+                const originalCreationTime = orders[index].creationTime;
+                orders[index] = orderData; 
+                // Restore original creation time so it doesn't overwrite with edit time (unless desired, but usually creation time is static)
+                if(originalCreationTime) orders[index].creationTime = originalCreationTime; 
+                // If editing, timestamp updates for "recent activity" logic
+                orders[index].timestamp = Date.now();
+            } else {
+                orders.push(orderData);
+            }
+
+            saveData();
+            closeModal('modal-order');
+            renderOrders();
+        }
+
+        function deleteOrder(id) {
+            pendingDeleteId = id;
+            openModal('modal-delete');
+        }
+
+        function confirmDelete() {
+            if (pendingDeleteId) {
+                orders = orders.filter(o => o.id !== pendingDeleteId);
+                saveData();
+                renderOrders();
+                pendingDeleteId = null;
+            }
+            closeModal('modal-delete');
+        }
+
+        function editOrder(id) {
+            const order = orders.find(o => o.id === id);
+            if (!order) return;
+
+            document.getElementById('order-id').value = order.id;
+            document.getElementById('order-num').value = order.number;
+            document.getElementById('order-creation-time').value = order.creationTime || ''; // Load time
+            document.getElementById('order-supplier').value = order.supplier;
+            document.getElementById('order-product').value = order.product;
+            document.getElementById('order-date').value = order.date;
+            document.getElementById('order-status').value = order.status;
+
+            document.getElementById('modal-title').innerText = 'Editar Ordem';
+            document.getElementById('btn-save-order').innerText = 'Atualizar';
+
+            openModal('modal-order');
+        }
+
+        function filterOrders() {
+            renderOrders();
+        }
+
+        function updateOrderStatus(id, newStatus) {
+            const orderIndex = orders.findIndex(o => o.id === id);
+            if (orderIndex > -1) {
+                orders[orderIndex].status = newStatus;
+                saveData(); 
+                renderOrders(); 
+            }
+        }
+
+        function renderOrders() {
+            const search = document.getElementById('search-order').value.toLowerCase();
+            const filter = document.getElementById('filter-status').value;
+            
+            const desktopBody = document.getElementById('orders-desktop-body');
+            const mobileGrid = document.getElementById('orders-mobile-grid');
+            
+            desktopBody.innerHTML = '';
+            mobileGrid.innerHTML = '';
+
+            const filtered = orders.filter(o => {
+                const matchesSearch = o.supplier.toLowerCase().includes(search) || 
+                                      o.product.toLowerCase().includes(search);
+                const matchesFilter = filter === 'all' || o.status === filter;
+                return matchesSearch && matchesFilter;
+            });
+
+            if (filtered.length === 0) {
+                document.getElementById('empty-state').classList.remove('hidden');
+            } else {
+                document.getElementById('empty-state').classList.add('hidden');
+                
+                filtered.forEach(o => {
+                    const statusConfig = getStatusConfig(o.status);
+                    const initial = o.supplier.charAt(0).toUpperCase();
+                    const timeDisplay = o.creationTime ? `<span class="block text-[10px] text-slate-400 mt-0.5 font-normal">Criado às ${o.creationTime}</span>` : '';
+                    
+                    // --- DESKTOP ROW ---
+                    const tr = document.createElement('tr');
+                    tr.className = "bg-white shadow-sm rounded-xl hover:shadow-md transition-shadow group";
+                    tr.innerHTML = `
+                        <td class="p-4 pl-6 first:rounded-l-xl font-semibold text-slate-700">
+                            <span class="text-slate-400 mr-1">#</span>${o.number}
+                            ${timeDisplay}
+                        </td>
+                        <td class="p-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 font-bold flex items-center justify-center text-xs border border-slate-200">
+                                    ${initial}
+                                </div>
+                                <span class="font-medium text-slate-700">${o.supplier}</span>
+                            </div>
+                        </td>
+                        <td class="p-4 text-slate-600 font-medium">${o.product}</td>
+                        <td class="p-4 text-slate-500 text-sm">
+                            <i class="fa-regular fa-calendar mr-2 text-slate-300"></i>${formatDate(o.date)}
+                        </td>
+                        <td class="p-4">
+                            <div class="relative inline-block w-full max-w-[140px]">
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-2 pointer-events-none">
+                                    <div class="w-2 h-2 rounded-full ${statusConfig.dotClass}"></div>
+                                </div>
+                                <select onchange="updateOrderStatus(${o.id}, this.value)" 
+                                        class="w-full appearance-none pl-6 py-1.5 pr-8 rounded-lg text-xs font-bold border border-transparent hover:bg-slate-50 focus:outline-none cursor-pointer transition-all ${statusConfig.textClass}">
+                                    <option value="aguardando" ${o.status === 'aguardando' ? 'selected' : ''}>Aguardando</option>
+                                    <option value="assinatura" ${o.status === 'assinatura' ? 'selected' : ''}>Assinatura</option>
+                                    <option value="entregue" ${o.status === 'entregue' ? 'selected' : ''}>Entregue</option>
+                                </select>
+                            </div>
+                        </td>
+                        <td class="p-4 pr-6 text-right last:rounded-r-xl">
+                            <div class="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button onclick="editOrder(${o.id})" class="w-8 h-8 rounded-lg text-slate-400 hover:text-brand-600 hover:bg-brand-50 transition-colors" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="deleteOrder(${o.id})" class="w-8 h-8 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </td>
+                    `;
+                    desktopBody.appendChild(tr);
+
+                    // --- MOBILE CARD ---
+                    const card = document.createElement('div');
+                    card.className = "bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-col gap-4";
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-slate-50 text-slate-600 font-bold flex items-center justify-center border border-slate-100">
+                                    ${initial}
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800 leading-tight">${o.supplier}</h4>
+                                    <span class="text-xs text-slate-400 font-medium">#${o.number} ${o.creationTime ? ' • ' + o.creationTime : ''}</span>
+                                </div>
+                            </div>
+                            <div class="relative">
+                                <select onchange="updateOrderStatus(${o.id}, this.value)" 
+                                        class="appearance-none pl-3 py-1 pr-6 rounded-lg text-xs font-bold border border-slate-100 bg-slate-50 focus:outline-none cursor-pointer ${statusConfig.textClass}">
+                                    <option value="aguardando" ${o.status === 'aguardando' ? 'selected' : ''}>Aguardando</option>
+                                    <option value="assinatura" ${o.status === 'assinatura' ? 'selected' : ''}>Assinatura</option>
+                                    <option value="entregue" ${o.status === 'entregue' ? 'selected' : ''}>Entregue</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <div class="bg-slate-50 p-2 rounded-lg">
+                                <p class="text-xs text-slate-400 uppercase font-bold mb-1">Produto</p>
+                                <p class="text-slate-700 font-medium truncate">${o.product}</p>
+                            </div>
+                            <div class="bg-slate-50 p-2 rounded-lg">
+                                <p class="text-xs text-slate-400 uppercase font-bold mb-1">Entrega</p>
+                                <p class="text-slate-700 font-medium">${formatDate(o.date)}</p>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end gap-2 border-t border-slate-50 pt-3">
+                            <button onclick="editOrder(${o.id})" class="text-xs font-bold text-slate-500 hover:text-brand-600 px-3 py-2 rounded-lg hover:bg-slate-50">EDITAR</button>
+                            <button onclick="deleteOrder(${o.id})" class="text-xs font-bold text-slate-500 hover:text-red-500 px-3 py-2 rounded-lg hover:bg-slate-50">EXCLUIR</button>
+                        </div>
+                    `;
+                    mobileGrid.appendChild(card);
+                });
+            }
+        }
+
+        function getStatusConfig(status) {
+            switch(status) {
+                case 'entregue': return { 
+                    textClass: 'text-emerald-600', 
+                    dotClass: 'bg-emerald-500'
+                };
+                case 'aguardando': return { 
+                    textClass: 'text-amber-600', 
+                    dotClass: 'bg-amber-500'
+                };
+                case 'assinatura': return { 
+                    textClass: 'text-indigo-600', 
+                    dotClass: 'bg-indigo-500'
+                };
+                default: return { 
+                    textClass: 'text-slate-600', 
+                    dotClass: 'bg-slate-400'
+                };
+            }
+        }
+
+        // --- REMINDER LOGIC ---
+        function saveReminder(e) {
+            e.preventDefault();
+            const text = document.getElementById('reminder-text').value;
+            const date = document.getElementById('reminder-date').value;
+
+            reminders.push({
+                id: Date.now(),
+                text,
+                date,
+                done: false,
+                notified: false // Added notified flag
+            });
+
+            saveData();
+            closeModal('modal-reminder');
+            renderReminders();
+            checkReminders(); // Check immediately
+        }
+
+        function deleteReminder(id) {
+            reminders = reminders.filter(r => r.id !== id);
+            saveData();
+            renderReminders();
+        }
+
+        function toggleReminder(id) {
+            const r = reminders.find(item => item.id === id);
+            if(r) r.done = !r.done;
+            saveData();
+            renderReminders();
+        }
+
+        function renderReminders() {
+            // Render on Reminders Page
+            const grid = document.getElementById('reminders-grid');
+            grid.innerHTML = '';
+            
+            if(reminders.length === 0) {
+                document.getElementById('reminders-empty').classList.remove('hidden');
+            } else {
+                document.getElementById('reminders-empty').classList.add('hidden');
+                
+                reminders.forEach(r => {
+                    const div = document.createElement('div');
+                    div.className = `bg-white p-6 rounded-2xl shadow-sm border transition-all duration-300 ${r.done ? 'border-slate-100 opacity-60' : 'border-purple-100 hover:shadow-md hover:-translate-y-1'}`;
+                    div.innerHTML = `
+                        <div class="flex items-start gap-4">
+                            <button onclick="toggleReminder(${r.id})" class="mt-1 flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${r.done ? 'bg-purple-400 border-purple-400 text-white' : 'border-slate-300 text-transparent hover:border-purple-400'}">
+                                <i class="fa-solid fa-check text-xs"></i>
+                            </button>
+                            <div class="flex-1">
+                                <p class="${r.done ? 'line-through text-slate-400' : 'text-slate-800'} font-medium text-lg leading-snug">${r.text}</p>
+                                ${r.date ? `<p class="text-xs ${r.done ? 'text-slate-300' : 'text-purple-600/70'} mt-3 font-medium flex items-center gap-1"><i class="fa-regular fa-calendar"></i> ${formatDate(r.date)}</p>` : ''}
+                            </div>
+                            <button onclick="deleteReminder(${r.id})" class="text-slate-300 hover:text-red-400 transition-colors"><i class="fa-solid fa-times"></i></button>
+                        </div>
+                    `;
+                    grid.appendChild(div);
+                });
+            }
+        }
+
+        // --- DASHBOARD LOGIC ---
+        function updateDashboard() {
+            // 1. Stats Calculation
+            const total = orders.length;
+            const delivered = orders.filter(o => o.status === 'entregue').length;
+            const waiting = orders.filter(o => o.status === 'aguardando').length;
+            const signing = orders.filter(o => o.status === 'assinatura').length;
+
+            // 3. Update Text Counters
+            animateValue("kpi-delivered", parseInt(document.getElementById("kpi-delivered").innerText), delivered, 800);
+            animateValue("kpi-waiting", parseInt(document.getElementById("kpi-waiting").innerText), waiting, 800);
+            animateValue("kpi-signing", parseInt(document.getElementById("kpi-signing").innerText), signing, 800);
+
+            // 4. Update Progress Bars
+            const safeTotal = total > 0 ? total : 1; // Avoid division by zero
+            document.getElementById('bar-delivered').style.width = `${(delivered/safeTotal)*100}%`;
+            document.getElementById('bar-waiting').style.width = `${(waiting/safeTotal)*100}%`;
+            document.getElementById('bar-signing').style.width = `${(signing/safeTotal)*100}%`;
+
+            // 5. Update Side Panel Stats
+            document.getElementById('stat-perc-delivered').innerText = `${Math.round((delivered/safeTotal)*100)}%`;
+            document.getElementById('stat-bar-delivered').style.width = `${(delivered/safeTotal)*100}%`;
+            
+            document.getElementById('stat-perc-waiting').innerText = `${Math.round((waiting/safeTotal)*100)}%`;
+            document.getElementById('stat-bar-waiting').style.width = `${(waiting/safeTotal)*100}%`;
+            
+            document.getElementById('stat-perc-signing').innerText = `${Math.round((signing/safeTotal)*100)}%`;
+            document.getElementById('stat-bar-signing').style.width = `${(signing/safeTotal)*100}%`;
+
+
+            // 6. Upcoming Deliveries (Next 7 days)
+            const upcomingBody = document.getElementById('upcoming-deliveries-body');
+            upcomingBody.innerHTML = '';
+            
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const nextWeek = new Date(today);
+            nextWeek.setDate(today.getDate() + 7);
+
+            const upcomingOrders = orders.filter(o => {
+                if(!o.date) return false;
+                // Parse date string (YYYY-MM-DD) manually to avoid timezone issues
+                const [y, m, d] = o.date.split('-').map(Number);
+                const orderDate = new Date(y, m - 1, d); 
+                return orderDate >= today && orderDate <= nextWeek && o.status !== 'entregue';
+            }).sort((a,b) => new Date(a.date) - new Date(b.date));
+
+            if(upcomingOrders.length > 0) {
+                document.getElementById('upcoming-empty').classList.add('hidden');
+                upcomingOrders.forEach(o => {
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-50 transition-colors";
+                    tr.innerHTML = `
+                        <td class="px-6 py-3 font-medium text-slate-700">${formatDate(o.date)}</td>
+                        <td class="px-6 py-3 text-slate-600">${o.supplier}</td>
+                        <td class="px-6 py-3 text-slate-500">${o.product}</td>
+                    `;
+                    upcomingBody.appendChild(tr);
+                });
+            } else {
+                document.getElementById('upcoming-empty').classList.remove('hidden');
+            }
+
+            // 7. Dashboard Reminders (Top 4 Pending)
+            const dashboardRemindersList = document.getElementById('dashboard-reminders-list');
+            dashboardRemindersList.innerHTML = '';
+            const pendingReminders = reminders.filter(r => !r.done).slice(0, 4);
+
+            if (pendingReminders.length > 0) {
+                pendingReminders.forEach(r => {
+                    const div = document.createElement('div');
+                    div.className = "bg-purple-50 rounded-lg p-3 border border-purple-100 flex items-start gap-3";
+                    div.innerHTML = `
+                         <i class="fa-regular fa-clock text-purple-500 mt-1"></i>
+                         <div class="flex-1">
+                            <p class="text-sm font-medium text-slate-700 leading-snug line-clamp-2">${r.text}</p>
+                            ${r.date ? `<p class="text-[10px] text-purple-600/70 font-bold mt-1">${formatDate(r.date)}</p>` : ''}
+                         </div>
+                    `;
+                    dashboardRemindersList.appendChild(div);
+                });
+            } else {
+                dashboardRemindersList.innerHTML = `
+                    <div class="col-span-2 flex flex-col items-center justify-center text-slate-300 py-4">
+                        <i class="fa-solid fa-mug-hot text-xl mb-1"></i>
+                        <p class="text-xs">Tudo em dia!</p>
+                    </div>
+                `;
+            }
+        }
+
+        // --- UTILS ---
+        function saveData() {
+            localStorage.setItem('sys_orders', JSON.stringify(orders));
+            localStorage.setItem('sys_reminders', JSON.stringify(reminders));
+            updateDashboard();
+        }
+
+        function formatDate(dateString) {
+            if(!dateString) return '';
+            const [y, m, d] = dateString.split('-');
+            return `${d}/${m}/${y}`;
+        }
+
+        function animateValue(id, start, end, duration) {
+            if (start === end) return;
+            const obj = document.getElementById(id);
+            if(!obj) return;
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * (end - start) + start);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+    </script>
+</body>
+</html>
