@@ -94,7 +94,7 @@
                 <i class="fa-solid fa-circle-xmark mr-1"></i> Senha incorreta. Tente novamente.
             </p>
             
-            <p class="text-slate-300 text-xs mt-8">SysCompras v1.4 • Segurança Ativa</p>
+            <p class="text-slate-300 text-xs mt-8">SysCompras v1.5 • Segurança Ativa</p>
         </div>
     </div>
 
@@ -119,8 +119,14 @@
                 <p class="text-xs text-brand-600 font-medium" id="header-time">00:00</p>
             </div>
             <div class="h-8 w-px bg-gray-200 hidden sm:block"></div>
-            <div class="w-9 h-9 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400">
-                <i class="fa-solid fa-user"></i>
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <!-- BOTÃO SAIR (LOGOUT) -->
+                <button onclick="logout()" class="text-slate-400 hover:text-red-500 hover:bg-red-50 w-9 h-9 rounded-full flex items-center justify-center transition-colors" title="Sair do Sistema">
+                    <i class="fa-solid fa-right-from-bracket text-lg"></i>
+                </button>
             </div>
         </div>
     </header>
@@ -149,6 +155,9 @@
             <p class="px-4 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 mt-6">Sistema</p>
             <button onclick="showPage('settings'); toggleSidebar()" id="nav-settings" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-left rounded-xl transition-all duration-200 group text-slate-600 hover:bg-slate-50 border border-transparent">
                 <i class="fa-solid fa-gear w-5 group-hover:text-brand-600 transition-colors"></i> <span class="font-medium">Configurações</span>
+            </button>
+            <button onclick="logout(); toggleSidebar()" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-left rounded-xl transition-all duration-200 group text-slate-600 hover:bg-red-50 hover:text-red-600 border border-transparent">
+                <i class="fa-solid fa-right-from-bracket w-5 group-hover:text-red-600 transition-colors"></i> <span class="font-medium">Sair</span>
             </button>
         </nav>
 
@@ -337,7 +346,7 @@
             <div class="bg-white p-2 rounded-xl border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row gap-2">
                 <div class="flex-1 relative">
                     <i class="fa-solid fa-search absolute left-4 top-3.5 text-slate-400"></i>
-                    <input type="text" id="search-order" onkeyup="filterOrders()" placeholder="Buscar fornecedor, produto..." class="w-full pl-11 pr-4 py-3 rounded-lg border-none focus:ring-0 text-slate-700 placeholder-slate-400 font-medium bg-transparent">
+                    <input type="text" id="search-order" onkeyup="filterOrders()" placeholder="Buscar fornecedor, produto, setor..." class="w-full pl-11 pr-4 py-3 rounded-lg border-none focus:ring-0 text-slate-700 placeholder-slate-400 font-medium bg-transparent">
                 </div>
                 <div class="h-auto w-px bg-slate-200 hidden md:block my-2"></div>
                 <select id="filter-status" onchange="filterOrders()" class="p-3 px-4 rounded-lg border-none focus:ring-0 bg-transparent font-medium text-slate-600 cursor-pointer hover:bg-slate-50 transition-colors">
@@ -352,9 +361,10 @@
             <div class="hidden md:block overflow-x-auto pb-4">
                 <table class="w-full table-spacing">
                     <thead>
-                        <tr class="text-xs uppercase text-slate-400 font-bold tracking-wider text-left">
+                        <tr class="text-xs uppercase text-slate-400 font-bold tracking-wider text-center">
                             <th class="pb-4 pl-6">Ordem</th>
                             <th class="pb-4">Fornecedor</th>
+                            <th class="pb-4">Setor</th>
                             <th class="pb-4">Produto</th>
                             <th class="pb-4">Entrega</th>
                             <th class="pb-4">Status</th>
@@ -477,6 +487,17 @@
                         <input type="text" id="order-supplier" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium">
                     </div>
                     <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Setor Solicitante</label>
+                        <input type="text" id="order-sector" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium" placeholder="Ex: RH, TI, Marketing">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Produto / Serviço</label>
+                        <input type="text" id="order-product" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium">
+                    </div>
+                    <div>
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Situação Atual</label>
                         <div class="relative">
                             <select id="order-status" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium appearance-none">
@@ -487,11 +508,6 @@
                             <i class="fa-solid fa-chevron-down absolute right-4 top-4 text-slate-400 text-xs pointer-events-none"></i>
                         </div>
                     </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Produto / Serviço</label>
-                    <input type="text" id="order-product" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium">
                 </div>
 
                 <div class="pt-4 flex justify-end gap-3 border-t border-slate-100">
@@ -586,6 +602,12 @@
                     errorMsg.classList.add('hidden');
                 }, 3000);
             }
+        }
+
+        // --- LOGOUT LOGIC ---
+        function logout() {
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('login-password').value = '';
         }
 
         // --- BACKUP & RESTORE LOGIC ---
@@ -771,6 +793,7 @@
                 number: document.getElementById('order-num').value,
                 creationTime: document.getElementById('order-creation-time').value, // Save time
                 supplier: document.getElementById('order-supplier').value,
+                sector: document.getElementById('order-sector').value, // Save sector
                 product: document.getElementById('order-product').value,
                 date: document.getElementById('order-date').value,
                 status: document.getElementById('order-status').value,
@@ -818,6 +841,7 @@
             document.getElementById('order-num').value = order.number;
             document.getElementById('order-creation-time').value = order.creationTime || ''; // Load time
             document.getElementById('order-supplier').value = order.supplier;
+            document.getElementById('order-sector').value = order.sector || ''; // Load sector
             document.getElementById('order-product').value = order.product;
             document.getElementById('order-date').value = order.date;
             document.getElementById('order-status').value = order.status;
@@ -853,7 +877,8 @@
 
             const filtered = orders.filter(o => {
                 const matchesSearch = o.supplier.toLowerCase().includes(search) || 
-                                      o.product.toLowerCase().includes(search);
+                                      o.product.toLowerCase().includes(search) ||
+                                      (o.sector && o.sector.toLowerCase().includes(search));
                 const matchesFilter = filter === 'all' || o.status === filter;
                 return matchesSearch && matchesFilter;
             });
@@ -872,24 +897,29 @@
                     const tr = document.createElement('tr');
                     tr.className = "bg-white shadow-sm rounded-xl hover:shadow-md transition-shadow group";
                     tr.innerHTML = `
-                        <td class="p-4 pl-6 first:rounded-l-xl font-semibold text-slate-700">
-                            <span class="text-slate-400 mr-1">#</span>${o.number}
-                            ${timeDisplay}
+                        <td class="p-4 pl-6 first:rounded-l-xl font-semibold text-slate-700 text-center align-middle">
+                            <div class="flex flex-col items-center justify-center">
+                                <span><span class="text-slate-400 mr-1">#</span>${o.number}</span>
+                                ${timeDisplay}
+                            </div>
                         </td>
-                        <td class="p-4">
-                            <div class="flex items-center gap-3">
+                        <td class="p-4 align-middle">
+                            <div class="flex items-center justify-center gap-3">
                                 <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 font-bold flex items-center justify-center text-xs border border-slate-200">
                                     ${initial}
                                 </div>
                                 <span class="font-medium text-slate-700">${o.supplier}</span>
                             </div>
                         </td>
-                        <td class="p-4 text-slate-600 font-medium">${o.product}</td>
-                        <td class="p-4 text-slate-500 text-sm">
-                            <i class="fa-regular fa-calendar mr-2 text-slate-300"></i>${formatDate(o.date)}
+                        <td class="p-4 text-slate-600 font-medium text-center align-middle">${o.sector || '-'}</td>
+                        <td class="p-4 text-slate-600 font-medium text-center align-middle">${o.product}</td>
+                        <td class="p-4 text-slate-500 text-sm text-center align-middle">
+                            <div class="flex items-center justify-center">
+                                <i class="fa-regular fa-calendar mr-2 text-slate-300"></i>${formatDate(o.date)}
+                            </div>
                         </td>
-                        <td class="p-4">
-                            <div class="relative inline-block w-full max-w-[140px]">
+                        <td class="p-4 text-center align-middle">
+                            <div class="relative inline-block w-full max-w-[140px] mx-auto">
                                 <div class="absolute inset-y-0 left-0 flex items-center pl-2 pointer-events-none">
                                     <div class="w-2 h-2 rounded-full ${statusConfig.dotClass}"></div>
                                 </div>
@@ -901,7 +931,7 @@
                                 </select>
                             </div>
                         </td>
-                        <td class="p-4 pr-6 text-right last:rounded-r-xl">
+                        <td class="p-4 pr-6 text-right align-middle last:rounded-r-xl">
                             <div class="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                 <button onclick="editOrder(${o.id})" class="w-8 h-8 rounded-lg text-slate-400 hover:text-brand-600 hover:bg-brand-50 transition-colors" title="Editar"><i class="fa-solid fa-pen"></i></button>
                                 <button onclick="deleteOrder(${o.id})" class="w-8 h-8 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors" title="Excluir"><i class="fa-solid fa-trash"></i></button>
@@ -936,12 +966,16 @@
                         
                         <div class="grid grid-cols-2 gap-2 text-sm">
                             <div class="bg-slate-50 p-2 rounded-lg">
-                                <p class="text-xs text-slate-400 uppercase font-bold mb-1">Produto</p>
-                                <p class="text-slate-700 font-medium truncate">${o.product}</p>
+                                <p class="text-xs text-slate-400 uppercase font-bold mb-1">Setor</p>
+                                <p class="text-slate-700 font-medium truncate">${o.sector || '-'}</p>
                             </div>
                             <div class="bg-slate-50 p-2 rounded-lg">
                                 <p class="text-xs text-slate-400 uppercase font-bold mb-1">Entrega</p>
                                 <p class="text-slate-700 font-medium">${formatDate(o.date)}</p>
+                            </div>
+                            <div class="bg-slate-50 p-2 rounded-lg col-span-2">
+                                <p class="text-xs text-slate-400 uppercase font-bold mb-1">Produto</p>
+                                <p class="text-slate-700 font-medium truncate">${o.product}</p>
                             </div>
                         </div>
 
