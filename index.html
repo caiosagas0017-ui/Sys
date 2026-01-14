@@ -55,8 +55,15 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* Toast Animation */
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .toast-enter { animation: slideInRight 0.3s ease-out forwards; }
         
-        /* Table Floating Rows Style */
+        /* Table Styles */
         .table-spacing {
             border-collapse: separate;
             border-spacing: 0 8px;
@@ -69,6 +76,11 @@
     </style>
 </head>
 <body class="bg-slate-50 text-slate-600 h-screen flex flex-col overflow-hidden">
+
+    <!-- TOAST CONTAINER (MENSAGENS DE ERRO/SUCESSO) -->
+    <div id="toast-container" class="fixed top-24 right-6 z-[70] flex flex-col gap-3 pointer-events-none">
+        <!-- JS injetará os alertas aqui -->
+    </div>
 
     <!-- TELA DE LOGIN (BLOQUEIO) -->
     <div id="login-screen" class="fixed inset-0 bg-slate-900 z-[100] flex items-center justify-center p-4">
@@ -91,7 +103,7 @@
             </form>
             
             <p id="login-error" class="text-red-500 text-sm mt-6 hidden font-medium bg-red-50 py-2 rounded-lg border border-red-100 animate-pulse">
-                <i class="fa-solid fa-circle-xmark mr-1"></i> Senha incorreta. Tente novamente.
+                <i class="fa-solid fa-circle-xmark mr-1"></i> Senha incorreta.
             </p>
             
             <p class="text-slate-300 text-xs mt-8">SysCompras v2.2 • Segurança Ativa</p>
@@ -214,23 +226,17 @@
             </div>
 
             <!-- Main Complex Grid -->
-            <!-- Alterado para suportar movimentação de widgets -->
             <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
                 
                 <!-- Coluna Esquerda (Principal) -->
                 <div id="col-main" class="xl:col-span-2 space-y-8 min-h-[200px]">
                     
                     <!-- Chart Section -->
-                    <div id="widget-chart" class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 transition-all duration-300">
+                    <div id="widget-chart" class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
                         <div class="flex justify-between items-end mb-6">
                             <div>
                                 <h3 class="text-lg font-bold text-slate-800">Análise de Distribuição</h3>
                                 <p class="text-sm text-slate-400">Visualização gráfica do status das ordens.</p>
-                            </div>
-                            <div class="flex gap-1 text-slate-300 text-xs">
-                                <button onclick="moveWidget('widget-chart', 'col-side')" class="hover:text-brand-600 hover:bg-slate-50 p-1.5 rounded" title="Mover para Lateral"><i class="fa-solid fa-arrow-right"></i></button>
-                                <button onclick="moveWidgetOrder('widget-chart', -1)" class="hover:text-brand-600 hover:bg-slate-50 p-1.5 rounded" title="Mover para Cima"><i class="fa-solid fa-arrow-up"></i></button>
-                                <button onclick="moveWidgetOrder('widget-chart', 1)" class="hover:text-brand-600 hover:bg-slate-50 p-1.5 rounded" title="Mover para Baixo"><i class="fa-solid fa-arrow-down"></i></button>
                             </div>
                         </div>
                         <!-- Container com altura fixa para o gráfico -->
@@ -240,7 +246,7 @@
                     </div>
 
                     <!-- Próximas Entregas (Detailed List) -->
-                    <div id="widget-upcoming" class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden transition-all duration-300">
+                    <div id="widget-upcoming" class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
                         <div class="px-8 py-6 border-b border-slate-50 flex justify-between items-center">
                             <div class="flex items-center gap-3">
                                 <div class="bg-brand-50 text-brand-600 w-10 h-10 rounded-xl flex items-center justify-center">
@@ -253,11 +259,6 @@
                             </div>
                             <div class="flex items-center gap-4">
                                 <button onclick="showPage('orders')" class="text-sm font-medium text-slate-500 hover:text-brand-600 transition-colors hidden sm:block">Ver todas <i class="fa-solid fa-arrow-right ml-1 text-xs"></i></button>
-                                <div class="flex gap-1 text-slate-300 text-xs border-l border-slate-100 pl-3">
-                                    <button onclick="moveWidget('widget-upcoming', 'col-side')" class="hover:text-brand-600 hover:bg-slate-50 p-1.5 rounded" title="Mover para Lateral"><i class="fa-solid fa-arrow-right"></i></button>
-                                    <button onclick="moveWidgetOrder('widget-upcoming', -1)" class="hover:text-brand-600 hover:bg-slate-50 p-1.5 rounded" title="Mover para Cima"><i class="fa-solid fa-arrow-up"></i></button>
-                                    <button onclick="moveWidgetOrder('widget-upcoming', 1)" class="hover:text-brand-600 hover:bg-slate-50 p-1.5 rounded" title="Mover para Baixo"><i class="fa-solid fa-arrow-down"></i></button>
-                                </div>
                             </div>
                         </div>
                         
@@ -287,18 +288,13 @@
                 <div id="col-side" class="space-y-8 min-h-[200px]">
                     
                     <!-- Lembretes Widget -->
-                    <div id="widget-reminders" class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden flex flex-col min-h-[420px] transition-all duration-300">
+                    <div id="widget-reminders" class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden flex flex-col min-h-[420px]">
                         <div class="p-6 border-b border-slate-50 bg-slate-50/30 flex justify-between items-center">
                             <h3 class="font-bold text-slate-700 flex items-center gap-2">
                                 <i class="fa-solid fa-thumbtack text-purple-500 transform rotate-45"></i> Quadro de Avisos
                             </h3>
                             <div class="flex items-center gap-2">
                                 <span class="text-[10px] font-bold bg-purple-100 text-purple-600 px-2 py-1 rounded-full" id="reminders-count-badge">0</span>
-                                <div class="flex gap-1 text-slate-300 text-xs border-l border-slate-200 pl-2 ml-1">
-                                    <button onclick="moveWidget('widget-reminders', 'col-main')" class="hover:text-brand-600 hover:bg-slate-50 p-1.5 rounded" title="Mover para Principal"><i class="fa-solid fa-arrow-left"></i></button>
-                                    <button onclick="moveWidgetOrder('widget-reminders', -1)" class="hover:text-brand-600 hover:bg-slate-50 p-1.5 rounded" title="Mover para Cima"><i class="fa-solid fa-arrow-up"></i></button>
-                                    <button onclick="moveWidgetOrder('widget-reminders', 1)" class="hover:text-brand-600 hover:bg-slate-50 p-1.5 rounded" title="Mover para Baixo"><i class="fa-solid fa-arrow-down"></i></button>
-                                </div>
                             </div>
                         </div>
                         <div class="flex-1 overflow-y-auto p-4 space-y-3" id="dashboard-reminders-list">
@@ -656,12 +652,6 @@
             { id: 'aguardando', label: 'Aguardando', color: 'amber', icon: 'fa-clock', isSystem: true },
             { id: 'assinatura', label: 'Assinatura', color: 'indigo', icon: 'fa-file-signature', isSystem: true }
         ];
-        
-        // --- LAYOUT STATE ---
-        let layoutConfig = JSON.parse(localStorage.getItem('sys_layout')) || {
-            main: ['widget-chart', 'widget-upcoming'],
-            side: ['widget-reminders']
-        };
 
         let pendingDeleteId = null;
         let pendingDeleteType = null; 
@@ -675,7 +665,6 @@
             if (!Array.isArray(statuses)) statuses = [];
 
             // Initialize all views
-            renderLayout(); // Init layout first
             renderOrders();
             renderReminders();
             renderStatuses();
@@ -700,85 +689,41 @@
             }, 60000); 
         });
 
-        // --- LAYOUT LOGIC ---
-        function renderLayout() {
-            const colMain = document.getElementById('col-main');
-            const colSide = document.getElementById('col-side');
+        // --- TOAST SYSTEM ---
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
             
-            if(!colMain || !colSide) return;
-
-            // Render Main Column
-            layoutConfig.main.forEach(widgetId => {
-                const widget = document.getElementById(widgetId);
-                if(widget) {
-                    colMain.appendChild(widget);
-                    updateWidgetControls(widgetId, 'main');
-                }
-            });
-
-            // Render Side Column
-            layoutConfig.side.forEach(widgetId => {
-                const widget = document.getElementById(widgetId);
-                if(widget) {
-                    colSide.appendChild(widget);
-                    updateWidgetControls(widgetId, 'side');
-                }
-            });
-        }
-
-        function updateWidgetControls(widgetId, colType) {
-            const widget = document.getElementById(widgetId);
-            if(!widget) return;
-            
-            // Just ensure proper buttons are calling the right functions
-            // The logic is handled in moveWidget and moveWidgetOrder
-            
-            // Optional: Adjust styles based on column
-            // if(colType === 'side') {
-            //     // Add specific classes if needed for side column items
-            // }
-        }
-
-        function moveWidget(widgetId, targetColId) {
-            // Remove from current arrays
-            layoutConfig.main = layoutConfig.main.filter(id => id !== widgetId);
-            layoutConfig.side = layoutConfig.side.filter(id => id !== widgetId);
-
-            // Add to new array
-            if(targetColId === 'col-main') {
-                layoutConfig.main.push(widgetId);
+            // Define colors
+            let bgClass, iconClass, icon;
+            if (type === 'error') {
+                bgClass = 'bg-white border-l-4 border-red-500 text-slate-800';
+                iconClass = 'text-red-500';
+                icon = 'fa-circle-xmark';
+            } else if (type === 'success') {
+                bgClass = 'bg-white border-l-4 border-green-500 text-slate-800';
+                iconClass = 'text-green-500';
+                icon = 'fa-circle-check';
             } else {
-                layoutConfig.side.push(widgetId);
+                bgClass = 'bg-white border-l-4 border-blue-500 text-slate-800';
+                iconClass = 'text-blue-500';
+                icon = 'fa-circle-info';
             }
 
-            saveLayout();
-            renderLayout();
-        }
+            toast.className = `toast-enter p-4 rounded-lg shadow-lg flex items-center gap-3 w-80 pointer-events-auto transform transition-all duration-300 ${bgClass}`;
+            toast.innerHTML = `
+                <i class="fa-solid ${icon} ${iconClass} text-xl"></i>
+                <p class="font-medium text-sm">${message}</p>
+            `;
 
-        function moveWidgetOrder(widgetId, direction) {
-            // Determine which array the widget is in
-            let arr = null;
-            if(layoutConfig.main.includes(widgetId)) arr = layoutConfig.main;
-            else if(layoutConfig.side.includes(widgetId)) arr = layoutConfig.side;
+            container.appendChild(toast);
 
-            if(!arr) return;
-
-            const index = arr.indexOf(widgetId);
-            const newIndex = index + direction;
-
-            if(newIndex >= 0 && newIndex < arr.length) {
-                // Swap
-                const temp = arr[index];
-                arr[index] = arr[newIndex];
-                arr[newIndex] = temp;
-                
-                saveLayout();
-                renderLayout();
-            }
-        }
-
-        function saveLayout() {
-            localStorage.setItem('sys_layout', JSON.stringify(layoutConfig));
+            // Remove automatically
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 2000);
         }
 
         // --- NOTIFICATIONS ---
@@ -788,6 +733,7 @@
                     const dot = document.getElementById('notification-dot');
                     if(dot) dot.classList.add('hidden');
                     new Notification("SysCompras", { body: "Notificações ativadas com sucesso!" });
+                    showToast('Notificações ativadas!', 'success');
                     checkReminders();
                     checkDeliveries();
                 } else {
@@ -907,16 +853,20 @@
             e.preventDefault();
             const pass = document.getElementById('login-password').value;
             const errorMsg = document.getElementById('login-error');
+            
             if(pass === '1234') {
                 document.getElementById('login-screen').classList.add('hidden');
+                // Mensagem de boas-vindas removida
             } else {
                 errorMsg.classList.remove('hidden');
                 setTimeout(() => errorMsg.classList.add('hidden'), 3000);
+                showToast('Senha incorreta. Tente novamente.', 'error');
             }
         }
         function logout() {
             document.getElementById('login-screen').classList.remove('hidden');
             document.getElementById('login-password').value = '';
+            showToast('Sessão encerrada.', 'info');
         }
 
         // --- DATA PERSISTENCE ---
@@ -944,6 +894,7 @@
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+            showToast('Backup exportado com sucesso!', 'success');
         }
 
         function importData(event) {
@@ -959,13 +910,14 @@
                             reminders = parsedData.reminders || [];
                             statuses = parsedData.statuses || statuses;
                             saveData();
-                            location.reload(); 
+                            showToast('Dados restaurados com sucesso!', 'success');
+                            setTimeout(() => location.reload(), 1000);
                         }
                     } else {
-                        alert('Arquivo inválido.');
+                        showToast('Arquivo de backup inválido.', 'error');
                     }
                 } catch (error) {
-                    alert('Erro ao ler arquivo.');
+                    showToast('Erro ao ler arquivo.', 'error');
                 }
                 event.target.value = '';
             };
@@ -997,12 +949,13 @@
             populateStatusSelects(); 
             updateDashboard(); 
             renderOrders(); 
+            showToast('Status salvo com sucesso!', 'success');
         }
 
         function deleteStatus(id) {
             const status = statuses.find(s => s.id === id);
             if(status && status.isSystem) {
-                alert('Este status é padrão do sistema e não pode ser excluído.');
+                showToast('Este status é padrão e não pode ser excluído.', 'error');
                 return;
             }
             pendingDeleteId = id;
@@ -1021,6 +974,7 @@
             openModal('modal-status');
         }
 
+        // --- NOVA FUNÇÃO PARA MOVER STATUS ---
         function moveStatus(id, direction) {
             const index = statuses.findIndex(s => s.id === id);
             if (index < 0) return;
@@ -1028,14 +982,15 @@
             const newIndex = index + direction;
 
             if (newIndex >= 0 && newIndex < statuses.length) {
+                // Troca de posição
                 const temp = statuses[index];
                 statuses[index] = statuses[newIndex];
                 statuses[newIndex] = temp;
                 
                 saveData();
                 renderStatuses();
-                populateStatusSelects(); 
-                updateDashboard();
+                populateStatusSelects(); // Atualiza ordem nos selects
+                updateDashboard(); // Atualiza ordem no gráfico
             }
         }
 
@@ -1049,6 +1004,7 @@
                 tr.className = "hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0";
                 const badgeClass = `bg-${s.color}-100 text-${s.color}-700`;
                 
+                // Define estado dos botões (desativar se for primeiro/último)
                 const isFirst = index === 0;
                 const isLast = index === statuses.length - 1;
                 const disableUp = isFirst ? 'opacity-30 cursor-not-allowed' : 'hover:bg-slate-100 hover:text-slate-800';
@@ -1065,6 +1021,7 @@
                     <td class="px-6 py-4 text-center text-slate-500"><i class="fa-solid ${s.icon}"></i></td>
                     <td class="px-6 py-4 text-right">
                         <div class="flex items-center justify-end gap-1">
+                            <!-- Botões de Movimento -->
                             <button onclick="moveStatus('${s.id}', -1)" class="text-slate-400 p-2 rounded transition-colors ${disableUp}" title="Mover para cima" ${isFirst ? 'disabled' : ''}>
                                 <i class="fa-solid fa-arrow-up"></i>
                             </button>
@@ -1131,7 +1088,14 @@
         function saveOrder(e) {
             e.preventDefault();
             const id = document.getElementById('order-id').value;
+            const dateInput = document.getElementById('order-date').value;
             
+            // Basic Validation
+            if(!dateInput) {
+                showToast('Selecione uma data válida!', 'error');
+                return;
+            }
+
             const orderData = {
                 id: id ? parseInt(id) : Date.now(),
                 number: document.getElementById('order-num').value,
@@ -1139,7 +1103,7 @@
                 supplier: document.getElementById('order-supplier').value,
                 sector: document.getElementById('order-sector').value, 
                 product: document.getElementById('order-product').value,
-                date: document.getElementById('order-date').value,
+                date: dateInput,
                 status: document.getElementById('order-status').value,
                 timestamp: Date.now()
             };
@@ -1151,9 +1115,11 @@
                     orders[index] = orderData; 
                     if(originalCreationTime) orders[index].creationTime = originalCreationTime; 
                     orders[index].timestamp = Date.now();
+                    showToast('Ordem atualizada com sucesso!', 'success');
                 }
             } else {
                 orders.push(orderData);
+                showToast('Nova ordem criada!', 'success');
             }
 
             saveData();
@@ -1171,12 +1137,15 @@
             if (pendingDeleteId) {
                 if(pendingDeleteType === 'order') {
                     orders = orders.filter(o => o.id !== pendingDeleteId);
+                    showToast('Ordem excluída.', 'success');
                 } else if (pendingDeleteType === 'reminder') {
                     reminders = reminders.filter(r => r.id !== pendingDeleteId);
+                    showToast('Lembrete removido.', 'success');
                 } else if (pendingDeleteType === 'status') {
                     statuses = statuses.filter(s => s.id !== pendingDeleteId);
                     populateStatusSelects();
                     renderStatuses();
+                    showToast('Status excluído.', 'success');
                 }
                 saveData();
                 renderOrders();
@@ -1217,6 +1186,7 @@
                 orders[orderIndex].status = newStatus;
                 saveData(); 
                 renderOrders(); 
+                showToast('Status atualizado!', 'info');
             }
         }
 
@@ -1380,6 +1350,7 @@
             closeModal('modal-reminder');
             renderReminders();
             checkReminders(); 
+            showToast('Lembrete criado!', 'success');
         }
 
         function deleteReminder(id) {
