@@ -231,21 +231,8 @@
                 <!-- Coluna Esquerda (Principal) -->
                 <div id="col-main" class="xl:col-span-2 space-y-8 min-h-[200px]">
                     
-                    <!-- Chart Section -->
-                    <div id="widget-chart" class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
-                        <div class="flex justify-between items-end mb-6">
-                            <div>
-                                <h3 class="text-lg font-bold text-slate-800">Análise de Distribuição</h3>
-                                <p class="text-sm text-slate-400">Visualização gráfica do status das ordens.</p>
-                            </div>
-                        </div>
-                        <!-- Container com altura fixa para o gráfico -->
-                        <div class="w-full h-80 relative">
-                            <canvas id="statusChart"></canvas>
-                        </div>
-                    </div>
-
                     <!-- Próximas Entregas (Detailed List) -->
+                    <!-- MOVIDO PARA CIMA -->
                     <div id="widget-upcoming" class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
                         <div class="px-8 py-6 border-b border-slate-50 flex justify-between items-center">
                             <div class="flex items-center gap-3">
@@ -279,6 +266,21 @@
                                 <i class="fa-regular fa-calendar-xmark text-4xl mb-3 opacity-30"></i>
                                 <p>Sem entregas agendadas para esta semana.</p>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Chart Section -->
+                    <!-- MOVIDO PARA BAIXO -->
+                    <div id="widget-chart" class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
+                        <div class="flex justify-between items-end mb-6">
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-800">Análise de Distribuição</h3>
+                                <p class="text-sm text-slate-400">Visualização gráfica do status das ordens.</p>
+                            </div>
+                        </div>
+                        <!-- Container com altura fixa para o gráfico -->
+                        <div class="w-full h-80 relative">
+                            <canvas id="statusChart"></canvas>
                         </div>
                     </div>
 
