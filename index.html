@@ -214,17 +214,23 @@
             </div>
 
             <!-- Main Complex Grid -->
+            <!-- Alterado para suportar movimentação de widgets -->
             <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
                 
-                <!-- Coluna Esquerda (Analytics & Entregas) -->
-                <div class="xl:col-span-2 space-y-8">
+                <!-- Coluna Esquerda (Principal) -->
+                <div id="col-main" class="xl:col-span-2 space-y-8 min-h-[200px]">
                     
                     <!-- Chart Section -->
-                    <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
+                    <div id="widget-chart" class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 transition-all duration-300">
                         <div class="flex justify-between items-end mb-6">
                             <div>
                                 <h3 class="text-lg font-bold text-slate-800">Análise de Distribuição</h3>
                                 <p class="text-sm text-slate-400">Visualização gráfica do status das ordens.</p>
+                            </div>
+                            <div class="flex gap-1 text-slate-300 text-xs">
+                                <button onclick="moveWidget('widget-chart', 'col-side')" class="hover:text-brand-600 hover:bg-slate-50 p-1.5 rounded" title="Mover para Lateral"><i class="fa-solid fa-arrow-right"></i></button>
+                                <button onclick="moveWidgetOrder('widget-chart', -1)" class="hover:text-brand-600 hover:bg-slate-50 p-1.5 rounded" title="Mover para Cima"><i class="fa-solid fa-arrow-up"></i></button>
+                                <button onclick="moveWidgetOrder('widget-chart', 1)" class="hover:text-brand-600 hover:bg-slate-50 p-1.5 rounded" title="Mover para Baixo"><i class="fa-solid fa-arrow-down"></i></button>
                             </div>
                         </div>
                         <!-- Container com altura fixa para o gráfico -->
@@ -234,7 +240,7 @@
                     </div>
 
                     <!-- Próximas Entregas (Detailed List) -->
-                    <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div id="widget-upcoming" class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden transition-all duration-300">
                         <div class="px-8 py-6 border-b border-slate-50 flex justify-between items-center">
                             <div class="flex items-center gap-3">
                                 <div class="bg-brand-50 text-brand-600 w-10 h-10 rounded-xl flex items-center justify-center">
@@ -245,7 +251,14 @@
                                     <p class="text-xs text-slate-400">Previsão para os próximos 7 dias</p>
                                 </div>
                             </div>
-                            <button onclick="showPage('orders')" class="text-sm font-medium text-slate-500 hover:text-brand-600 transition-colors">Ver todas <i class="fa-solid fa-arrow-right ml-1 text-xs"></i></button>
+                            <div class="flex items-center gap-4">
+                                <button onclick="showPage('orders')" class="text-sm font-medium text-slate-500 hover:text-brand-600 transition-colors hidden sm:block">Ver todas <i class="fa-solid fa-arrow-right ml-1 text-xs"></i></button>
+                                <div class="flex gap-1 text-slate-300 text-xs border-l border-slate-100 pl-3">
+                                    <button onclick="moveWidget('widget-upcoming', 'col-side')" class="hover:text-brand-600 hover:bg-slate-50 p-1.5 rounded" title="Mover para Lateral"><i class="fa-solid fa-arrow-right"></i></button>
+                                    <button onclick="moveWidgetOrder('widget-upcoming', -1)" class="hover:text-brand-600 hover:bg-slate-50 p-1.5 rounded" title="Mover para Cima"><i class="fa-solid fa-arrow-up"></i></button>
+                                    <button onclick="moveWidgetOrder('widget-upcoming', 1)" class="hover:text-brand-600 hover:bg-slate-50 p-1.5 rounded" title="Mover para Baixo"><i class="fa-solid fa-arrow-down"></i></button>
+                                </div>
+                            </div>
                         </div>
                         
                         <div class="p-0">
@@ -254,7 +267,7 @@
                                     <tr>
                                         <th class="px-8 py-4 pl-8">Data Prevista</th>
                                         <th class="px-8 py-4">Detalhes do Pedido</th>
-                                        <th class="px-8 py-4 text-right">Setor</th>
+                                        <th class="px-8 py-4 text-right hidden sm:table-cell">Setor</th>
                                     </tr>
                                 </thead>
                                 <tbody id="upcoming-deliveries-body" class="divide-y divide-slate-50 text-sm">
@@ -270,16 +283,23 @@
 
                 </div>
 
-                <!-- Coluna Direita (Widgets) -->
-                <div class="space-y-8">
+                <!-- Coluna Direita (Lateral) -->
+                <div id="col-side" class="space-y-8 min-h-[200px]">
                     
                     <!-- Lembretes Widget -->
-                    <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden flex flex-col h-[420px]">
+                    <div id="widget-reminders" class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden flex flex-col min-h-[420px] transition-all duration-300">
                         <div class="p-6 border-b border-slate-50 bg-slate-50/30 flex justify-between items-center">
                             <h3 class="font-bold text-slate-700 flex items-center gap-2">
                                 <i class="fa-solid fa-thumbtack text-purple-500 transform rotate-45"></i> Quadro de Avisos
                             </h3>
-                            <span class="text-[10px] font-bold bg-purple-100 text-purple-600 px-2 py-1 rounded-full" id="reminders-count-badge">0</span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] font-bold bg-purple-100 text-purple-600 px-2 py-1 rounded-full" id="reminders-count-badge">0</span>
+                                <div class="flex gap-1 text-slate-300 text-xs border-l border-slate-200 pl-2 ml-1">
+                                    <button onclick="moveWidget('widget-reminders', 'col-main')" class="hover:text-brand-600 hover:bg-slate-50 p-1.5 rounded" title="Mover para Principal"><i class="fa-solid fa-arrow-left"></i></button>
+                                    <button onclick="moveWidgetOrder('widget-reminders', -1)" class="hover:text-brand-600 hover:bg-slate-50 p-1.5 rounded" title="Mover para Cima"><i class="fa-solid fa-arrow-up"></i></button>
+                                    <button onclick="moveWidgetOrder('widget-reminders', 1)" class="hover:text-brand-600 hover:bg-slate-50 p-1.5 rounded" title="Mover para Baixo"><i class="fa-solid fa-arrow-down"></i></button>
+                                </div>
+                            </div>
                         </div>
                         <div class="flex-1 overflow-y-auto p-4 space-y-3" id="dashboard-reminders-list">
                             <!-- Filled by JS -->
@@ -605,6 +625,28 @@
         </div>
     </div>
 
+    <!-- MODAL NOTIFICATION (NEW) -->
+    <div id="modal-notification" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-[60] flex items-center justify-center p-4 transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden relative transform scale-100 transition-transform">
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+            <div class="p-8 text-center">
+                <div class="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
+                    <i class="fa-solid fa-truck-fast text-3xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-800 mb-2">Entregas Hoje!</h3>
+                <p class="text-slate-500 text-sm mb-6">As seguintes ordens estão agendadas para entrega hoje:</p>
+                
+                <div id="notification-list" class="bg-slate-50 rounded-xl p-4 mb-6 text-left space-y-3 max-h-60 overflow-y-auto border border-slate-100">
+                    <!-- JS Injected Content -->
+                </div>
+                
+                <button onclick="closeModal('modal-notification')" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold shadow-lg transition-all">
+                    Entendido
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // --- DATA STATE ---
         let orders = JSON.parse(localStorage.getItem('sys_orders')) || [];
@@ -614,6 +656,12 @@
             { id: 'aguardando', label: 'Aguardando', color: 'amber', icon: 'fa-clock', isSystem: true },
             { id: 'assinatura', label: 'Assinatura', color: 'indigo', icon: 'fa-file-signature', isSystem: true }
         ];
+        
+        // --- LAYOUT STATE ---
+        let layoutConfig = JSON.parse(localStorage.getItem('sys_layout')) || {
+            main: ['widget-chart', 'widget-upcoming'],
+            side: ['widget-reminders']
+        };
 
         let pendingDeleteId = null;
         let pendingDeleteType = null; 
@@ -627,6 +675,7 @@
             if (!Array.isArray(statuses)) statuses = [];
 
             // Initialize all views
+            renderLayout(); // Init layout first
             renderOrders();
             renderReminders();
             renderStatuses();
@@ -650,6 +699,87 @@
                 checkDeliveries(); 
             }, 60000); 
         });
+
+        // --- LAYOUT LOGIC ---
+        function renderLayout() {
+            const colMain = document.getElementById('col-main');
+            const colSide = document.getElementById('col-side');
+            
+            if(!colMain || !colSide) return;
+
+            // Render Main Column
+            layoutConfig.main.forEach(widgetId => {
+                const widget = document.getElementById(widgetId);
+                if(widget) {
+                    colMain.appendChild(widget);
+                    updateWidgetControls(widgetId, 'main');
+                }
+            });
+
+            // Render Side Column
+            layoutConfig.side.forEach(widgetId => {
+                const widget = document.getElementById(widgetId);
+                if(widget) {
+                    colSide.appendChild(widget);
+                    updateWidgetControls(widgetId, 'side');
+                }
+            });
+        }
+
+        function updateWidgetControls(widgetId, colType) {
+            const widget = document.getElementById(widgetId);
+            if(!widget) return;
+            
+            // Just ensure proper buttons are calling the right functions
+            // The logic is handled in moveWidget and moveWidgetOrder
+            
+            // Optional: Adjust styles based on column
+            // if(colType === 'side') {
+            //     // Add specific classes if needed for side column items
+            // }
+        }
+
+        function moveWidget(widgetId, targetColId) {
+            // Remove from current arrays
+            layoutConfig.main = layoutConfig.main.filter(id => id !== widgetId);
+            layoutConfig.side = layoutConfig.side.filter(id => id !== widgetId);
+
+            // Add to new array
+            if(targetColId === 'col-main') {
+                layoutConfig.main.push(widgetId);
+            } else {
+                layoutConfig.side.push(widgetId);
+            }
+
+            saveLayout();
+            renderLayout();
+        }
+
+        function moveWidgetOrder(widgetId, direction) {
+            // Determine which array the widget is in
+            let arr = null;
+            if(layoutConfig.main.includes(widgetId)) arr = layoutConfig.main;
+            else if(layoutConfig.side.includes(widgetId)) arr = layoutConfig.side;
+
+            if(!arr) return;
+
+            const index = arr.indexOf(widgetId);
+            const newIndex = index + direction;
+
+            if(newIndex >= 0 && newIndex < arr.length) {
+                // Swap
+                const temp = arr[index];
+                arr[index] = arr[newIndex];
+                arr[newIndex] = temp;
+                
+                saveLayout();
+                renderLayout();
+            }
+        }
+
+        function saveLayout() {
+            localStorage.setItem('sys_layout', JSON.stringify(layoutConfig));
+        }
 
         // --- NOTIFICATIONS ---
         function requestNotificationPermission() {
@@ -686,23 +816,60 @@
         }
 
         function checkDeliveries() {
-            if (Notification.permission !== "granted") return;
-
+            // Check system permission just in case we want both, but rely on modal primarily for "attention"
+            const hasSystemPermission = Notification.permission === "granted";
+            
             const today = new Date().toISOString().split('T')[0];
             let changed = false;
+            let deliveriesToday = [];
 
             orders.forEach(o => {
+                // Check if delivery is today, not delivered, and not yet notified in this session/state
                 if (o.status !== 'entregue' && o.date === today && !o.notified) {
-                    new Notification("Entrega Hoje!", {
-                        body: `${o.supplier} - ${o.product}\nSetor: ${o.sector || 'Geral'}`,
-                        icon: "https://cdn-icons-png.flaticon.com/512/2942/2942838.png"
-                    });
+                    deliveriesToday.push(o);
+                    
+                    // Trigger system notification if available
+                    if (hasSystemPermission) {
+                        new Notification("Entrega Hoje!", {
+                            body: `${o.supplier} - ${o.product}`,
+                            icon: "https://cdn-icons-png.flaticon.com/512/2942/2942838.png"
+                        });
+                    }
+                    
                     o.notified = true; 
                     changed = true;
                 }
             });
 
+            if (deliveriesToday.length > 0) {
+                showNotificationModal(deliveriesToday);
+            }
+
             if(changed) saveData();
+        }
+
+        function showNotificationModal(items) {
+            const list = document.getElementById('notification-list');
+            if(!list) return;
+            
+            list.innerHTML = '';
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = "flex items-start gap-3 pb-3 border-b border-slate-200 last:border-0 last:pb-0";
+                div.innerHTML = `
+                    <div class="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-xs font-bold text-slate-500 shrink-0">
+                        ${item.supplier.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                        <p class="font-bold text-slate-700 text-sm leading-tight">${item.supplier}</p>
+                        <p class="text-xs text-slate-500">${item.product}</p>
+                        <span class="text-[10px] bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full mt-1 inline-block">${item.sector || 'Geral'}</span>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+            
+            openModal('modal-notification');
         }
 
         // --- CLOCK & GREETING ---
@@ -854,25 +1021,64 @@
             openModal('modal-status');
         }
 
+        function moveStatus(id, direction) {
+            const index = statuses.findIndex(s => s.id === id);
+            if (index < 0) return;
+
+            const newIndex = index + direction;
+
+            if (newIndex >= 0 && newIndex < statuses.length) {
+                const temp = statuses[index];
+                statuses[index] = statuses[newIndex];
+                statuses[newIndex] = temp;
+                
+                saveData();
+                renderStatuses();
+                populateStatusSelects(); 
+                updateDashboard();
+            }
+        }
+
         function renderStatuses() {
             const tbody = document.getElementById('status-table-body');
             if(!tbody) return;
             tbody.innerHTML = '';
 
-            statuses.forEach(s => {
+            statuses.forEach((s, index) => {
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0";
                 const badgeClass = `bg-${s.color}-100 text-${s.color}-700`;
                 
+                const isFirst = index === 0;
+                const isLast = index === statuses.length - 1;
+                const disableUp = isFirst ? 'opacity-30 cursor-not-allowed' : 'hover:bg-slate-100 hover:text-slate-800';
+                const disableDown = isLast ? 'opacity-30 cursor-not-allowed' : 'hover:bg-slate-100 hover:text-slate-800';
+
                 tr.innerHTML = `
-                    <td class="px-6 py-4 font-medium text-slate-700">${s.label} ${s.isSystem ? '<i class="fa-solid fa-lock text-xs text-slate-300 ml-2" title="Sistema"></i>' : ''}</td>
+                    <td class="px-6 py-4 font-medium text-slate-700">
+                        ${s.label} 
+                        ${s.isSystem ? '<i class="fa-solid fa-lock text-xs text-slate-300 ml-2" title="Sistema"></i>' : ''}
+                    </td>
                     <td class="px-6 py-4 text-center">
                         <span class="px-3 py-1 rounded-full text-xs font-bold uppercase ${badgeClass}">${s.color}</span>
                     </td>
                     <td class="px-6 py-4 text-center text-slate-500"><i class="fa-solid ${s.icon}"></i></td>
-                    <td class="px-6 py-4 text-right space-x-2">
-                        <button onclick="editStatus('${s.id}')" class="text-blue-500 hover:bg-blue-50 p-2 rounded"><i class="fa-solid fa-pen"></i></button>
-                        ${!s.isSystem ? `<button onclick="deleteStatus('${s.id}')" class="text-red-500 hover:bg-red-50 p-2 rounded"><i class="fa-solid fa-trash"></i></button>` : ''}
+                    <td class="px-6 py-4 text-right">
+                        <div class="flex items-center justify-end gap-1">
+                            <button onclick="moveStatus('${s.id}', -1)" class="text-slate-400 p-2 rounded transition-colors ${disableUp}" title="Mover para cima" ${isFirst ? 'disabled' : ''}>
+                                <i class="fa-solid fa-arrow-up"></i>
+                            </button>
+                            <button onclick="moveStatus('${s.id}', 1)" class="text-slate-400 p-2 rounded transition-colors ${disableDown} mr-2" title="Mover para baixo" ${isLast ? 'disabled' : ''}>
+                                <i class="fa-solid fa-arrow-down"></i>
+                            </button>
+                            
+                            <div class="h-4 w-px bg-slate-200 mx-1"></div>
+                            
+                            <button onclick="editStatus('${s.id}')" class="text-blue-500 hover:bg-blue-50 p-2 rounded transition-colors" title="Editar">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            ${!s.isSystem ? `<button onclick="deleteStatus('${s.id}')" class="text-red-500 hover:bg-red-50 p-2 rounded transition-colors" title="Excluir"><i class="fa-solid fa-trash"></i></button>` : '<div class="w-8"></div>'}
+                        </div>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -1242,15 +1448,15 @@
                             div.className = "bg-white p-4 rounded-xl border border-slate-100 shadow-[0_2px_8px_rgba(0,0,0,0.02)] group hover:border-purple-200 hover:shadow-md transition-all cursor-pointer";
                             div.onclick = () => showPage('reminders');
                             div.innerHTML = `
-                                 <div class="flex items-start gap-3">
-                                     <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-500 flex items-center justify-center flex-shrink-0 group-hover:bg-purple-500 group-hover:text-white transition-colors">
-                                        <i class="fa-solid fa-thumbtack text-xs"></i>
+                                     <div class="flex items-start gap-3">
+                                         <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-500 flex items-center justify-center flex-shrink-0 group-hover:bg-purple-500 group-hover:text-white transition-colors">
+                                            <i class="fa-solid fa-thumbtack text-xs"></i>
+                                         </div>
+                                         <div class="flex-1 min-w-0">
+                                            <p class="text-sm font-semibold text-slate-700 leading-tight group-hover:text-purple-700 transition-colors line-clamp-2">${r.text}</p>
+                                            ${r.date ? `<p class="text-[10px] text-slate-400 mt-1 font-medium"><i class="fa-regular fa-clock mr-1"></i>${formatDate(r.date)}</p>` : ''}
+                                         </div>
                                      </div>
-                                     <div class="flex-1 min-w-0">
-                                        <p class="text-sm font-semibold text-slate-700 leading-tight group-hover:text-purple-700 transition-colors line-clamp-2">${r.text}</p>
-                                        ${r.date ? `<p class="text-[10px] text-slate-400 mt-1 font-medium"><i class="fa-regular fa-clock mr-1"></i>${formatDate(r.date)}</p>` : ''}
-                                     </div>
-                                 </div>
                             `;
                             dashboardList.appendChild(div);
                         });
