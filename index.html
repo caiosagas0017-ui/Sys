@@ -6,7 +6,7 @@
     <title>Sistema de Gestão de Compras</title>
     
     <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -94,7 +94,7 @@
                 <i class="fa-solid fa-circle-xmark mr-1"></i> Senha incorreta. Tente novamente.
             </p>
             
-            <p class="text-slate-300 text-xs mt-8">SysCompras v1.5 • Segurança Ativa</p>
+            <p class="text-slate-300 text-xs mt-8">SysCompras v2.2 • Segurança Ativa</p>
         </div>
     </div>
 
@@ -153,6 +153,9 @@
             </button>
             
             <p class="px-4 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 mt-6">Sistema</p>
+            <button onclick="showPage('status'); toggleSidebar()" id="nav-status" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-left rounded-xl transition-all duration-200 group text-slate-600 hover:bg-slate-50 border border-transparent">
+                <i class="fa-solid fa-tags w-5 group-hover:text-brand-600 transition-colors"></i> <span class="font-medium">Cadastro de Status</span>
+            </button>
             <button onclick="showPage('settings'); toggleSidebar()" id="nav-settings" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-left rounded-xl transition-all duration-200 group text-slate-600 hover:bg-slate-50 border border-transparent">
                 <i class="fa-solid fa-gear w-5 group-hover:text-brand-600 transition-colors"></i> <span class="font-medium">Configurações</span>
             </button>
@@ -176,161 +179,123 @@
     <main class="flex-1 overflow-y-auto pt-20 pb-8 bg-[#F8FAFC] relative scroll-smooth w-full">
         
         <!-- DASHBOARD PAGE -->
-        <div id="page-dashboard" class="px-6 md:px-8 max-w-[1600px] mx-auto fade-in">
+        <div id="page-dashboard" class="px-6 md:px-8 max-w-[1600px] mx-auto fade-in pb-12">
             
-            <!-- Welcome Header & Quick Actions -->
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8 mt-4">
-                <div>
-                    <h2 class="text-2xl font-bold text-slate-800" id="welcome-msg">Bom dia, Admin</h2>
-                    <p class="text-slate-500 text-sm mt-1">Aqui está o panorama das suas aquisições hoje.</p>
-                </div>
+            <!-- Welcome Banner & Quick Actions -->
+            <div class="relative bg-white rounded-3xl p-8 mb-8 shadow-sm border border-slate-100 overflow-hidden group">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-brand-50 to-brand-100 rounded-full blur-3xl opacity-50 -mr-16 -mt-16 pointer-events-none"></div>
                 
-                <div class="flex gap-3 overflow-x-auto pb-2 md:pb-0">
-                    <button onclick="newOrder()" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-lg shadow-slate-200 whitespace-nowrap">
-                        <i class="fa-solid fa-plus"></i> Nova Ordem
-                    </button>
-                    <button onclick="openModal('modal-reminder')" class="flex items-center gap-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap">
-                        <i class="fa-regular fa-note-sticky"></i> Anotar Lembrete
-                    </button>
-                </div>
-            </div>
-
-            <!-- KPI Cards Row -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-                <!-- Card 2: Entregues -->
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm group hover:border-emerald-200 transition-colors">
-                    <div class="flex justify-between items-start mb-2">
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Concluídas</p>
-                        <i class="fa-solid fa-check-circle text-emerald-500 bg-emerald-50 p-2 rounded-lg"></i>
+                <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                    <div>
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="bg-brand-100 text-brand-700 text-xs font-bold px-2 py-1 rounded-md uppercase tracking-wider">Visão Geral</span>
+                            <span class="text-slate-400 text-xs flex items-center gap-1"><i class="fa-regular fa-calendar"></i> <span id="banner-date">Hoje</span></span>
+                        </div>
+                        <h1 class="text-3xl font-bold text-slate-800 tracking-tight" id="welcome-msg">Painel de Controle</h1>
+                        <p class="text-slate-500 mt-1">Acompanhe métricas, prazos e atividades recentes em tempo real.</p>
                     </div>
-                    <h3 class="text-2xl font-bold text-slate-800" id="kpi-delivered">0</h3>
-                    <div class="w-full bg-slate-100 h-1.5 mt-3 rounded-full overflow-hidden">
-                        <div id="bar-delivered" class="h-full bg-emerald-500 rounded-full" style="width: 0%"></div>
-                    </div>
-                </div>
-
-                <!-- Card 3: Aguardando -->
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm group hover:border-amber-200 transition-colors">
-                    <div class="flex justify-between items-start mb-2">
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Em Aberto</p>
-                        <i class="fa-solid fa-clock text-amber-500 bg-amber-50 p-2 rounded-lg"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold text-slate-800" id="kpi-waiting">0</h3>
-                     <div class="w-full bg-slate-100 h-1.5 mt-3 rounded-full overflow-hidden">
-                        <div id="bar-waiting" class="h-full bg-amber-500 rounded-full" style="width: 0%"></div>
-                    </div>
-                </div>
-
-                <!-- Card 4: Assinatura -->
-                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm group hover:border-indigo-200 transition-colors">
-                    <div class="flex justify-between items-start mb-2">
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Assinatura</p>
-                        <i class="fa-solid fa-file-signature text-indigo-500 bg-indigo-50 p-2 rounded-lg"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold text-slate-800" id="kpi-signing">0</h3>
-                     <div class="w-full bg-slate-100 h-1.5 mt-3 rounded-full overflow-hidden">
-                        <div id="bar-signing" class="h-full bg-indigo-500 rounded-full" style="width: 0%"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Main Dashboard Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                
-                <!-- Coluna Principal (2/3) -->
-                <div class="lg:col-span-2 space-y-6">
                     
-                    <!-- Próximas Entregas -->
-                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                        <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                            <h3 class="font-bold text-slate-700 flex items-center gap-2">
-                                <i class="fa-solid fa-truck-fast text-brand-500"></i> Próximas Entregas
-                            </h3>
-                            <span class="text-xs font-medium bg-brand-100 text-brand-700 px-2 py-1 rounded">Próximos 7 dias</span>
-                        </div>
-                        <div class="p-0">
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-left text-sm">
-                                    <thead class="bg-slate-50 text-xs uppercase text-slate-400 font-semibold">
-                                        <tr>
-                                            <th class="px-6 py-3">Data</th>
-                                            <th class="px-6 py-3">Fornecedor</th>
-                                            <th class="px-6 py-3">Produto</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="upcoming-deliveries-body" class="divide-y divide-slate-100">
-                                        <!-- Filled by JS -->
-                                    </tbody>
-                                </table>
+                    <div class="flex gap-3">
+                        <button onclick="openModal('modal-reminder')" class="flex items-center gap-2 bg-white border border-slate-200 text-slate-600 hover:text-brand-600 hover:border-brand-200 px-5 py-3 rounded-xl text-sm font-semibold transition-all shadow-sm hover:shadow-md group">
+                            <i class="fa-regular fa-bell text-slate-400 group-hover:text-brand-500 transition-colors"></i>
+                            <span>Lembrete</span>
+                        </button>
+                        <button onclick="newOrder()" class="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-6 py-3 rounded-xl text-sm font-semibold transition-all shadow-lg shadow-slate-200 hover:shadow-xl hover:-translate-y-0.5">
+                            <div class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[10px]"><i class="fa-solid fa-plus"></i></div>
+                            <span>Nova Ordem</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic KPI Grid -->
+            <div id="kpi-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- JS Populated -->
+            </div>
+
+            <!-- Main Complex Grid -->
+            <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                
+                <!-- Coluna Esquerda (Analytics & Entregas) -->
+                <div class="xl:col-span-2 space-y-8">
+                    
+                    <!-- Chart Section -->
+                    <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
+                        <div class="flex justify-between items-end mb-6">
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-800">Análise de Distribuição</h3>
+                                <p class="text-sm text-slate-400">Visualização gráfica do status das ordens.</p>
                             </div>
-                            <div id="upcoming-empty" class="hidden py-8 text-center text-slate-400 text-sm">
-                                Nenhuma entrega prevista para esta semana.
+                        </div>
+                        <!-- Container com altura fixa para o gráfico -->
+                        <div class="w-full h-80 relative">
+                            <canvas id="statusChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Próximas Entregas (Detailed List) -->
+                    <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+                        <div class="px-8 py-6 border-b border-slate-50 flex justify-between items-center">
+                            <div class="flex items-center gap-3">
+                                <div class="bg-brand-50 text-brand-600 w-10 h-10 rounded-xl flex items-center justify-center">
+                                    <i class="fa-solid fa-truck-fast"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-slate-800">Próximas Entregas</h3>
+                                    <p class="text-xs text-slate-400">Previsão para os próximos 7 dias</p>
+                                </div>
+                            </div>
+                            <button onclick="showPage('orders')" class="text-sm font-medium text-slate-500 hover:text-brand-600 transition-colors">Ver todas <i class="fa-solid fa-arrow-right ml-1 text-xs"></i></button>
+                        </div>
+                        
+                        <div class="p-0">
+                            <table class="w-full text-left">
+                                <thead class="bg-slate-50/50 text-xs uppercase text-slate-400 font-semibold border-b border-slate-50">
+                                    <tr>
+                                        <th class="px-8 py-4 pl-8">Data Prevista</th>
+                                        <th class="px-8 py-4">Detalhes do Pedido</th>
+                                        <th class="px-8 py-4 text-right">Setor</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="upcoming-deliveries-body" class="divide-y divide-slate-50 text-sm">
+                                    <!-- JS Filled -->
+                                </tbody>
+                            </table>
+                            <div id="upcoming-empty" class="hidden py-12 flex flex-col items-center justify-center text-slate-400">
+                                <i class="fa-regular fa-calendar-xmark text-4xl mb-3 opacity-30"></i>
+                                <p>Sem entregas agendadas para esta semana.</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Lembretes Rápidos -->
-                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                        <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                </div>
+
+                <!-- Coluna Direita (Widgets) -->
+                <div class="space-y-8">
+                    
+                    <!-- Lembretes Widget -->
+                    <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden flex flex-col h-[420px]">
+                        <div class="p-6 border-b border-slate-50 bg-slate-50/30 flex justify-between items-center">
                             <h3 class="font-bold text-slate-700 flex items-center gap-2">
-                                <i class="fa-regular fa-bell text-purple-500"></i> Lembretes Prioritários
+                                <i class="fa-solid fa-thumbtack text-purple-500 transform rotate-45"></i> Quadro de Avisos
                             </h3>
-                            <button onclick="showPage('reminders')" class="text-xs text-brand-600 hover:underline">Ver todos</button>
+                            <span class="text-[10px] font-bold bg-purple-100 text-purple-600 px-2 py-1 rounded-full" id="reminders-count-badge">0</span>
                         </div>
-                        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4" id="dashboard-reminders-list">
+                        <div class="flex-1 overflow-y-auto p-4 space-y-3" id="dashboard-reminders-list">
                             <!-- Filled by JS -->
                         </div>
-                    </div>
-
-                </div>
-
-                <!-- Coluna Lateral (1/3) -->
-                <div class="space-y-6">
-                    <!-- Resumo Status -->
-                    <div class="bg-slate-800 text-white p-6 rounded-xl shadow-lg relative overflow-hidden">
-                        <div class="relative z-10">
-                            <h3 class="font-bold text-lg mb-1">Status Geral</h3>
-                            <p class="text-slate-400 text-xs mb-6">Proporção de pedidos</p>
-                            
-                            <div class="space-y-4">
-                                <div>
-                                    <div class="flex justify-between text-xs mb-1">
-                                        <span class="text-emerald-400">Entregue</span>
-                                        <span id="stat-perc-delivered">0%</span>
-                                    </div>
-                                    <div class="w-full bg-slate-700 rounded-full h-2">
-                                        <div id="stat-bar-delivered" class="bg-emerald-500 h-2 rounded-full" style="width: 0%"></div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="flex justify-between text-xs mb-1">
-                                        <span class="text-amber-400">Aguardando</span>
-                                        <span id="stat-perc-waiting">0%</span>
-                                    </div>
-                                    <div class="w-full bg-slate-700 rounded-full h-2">
-                                        <div id="stat-bar-waiting" class="bg-amber-500 h-2 rounded-full" style="width: 0%"></div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="flex justify-between text-xs mb-1">
-                                        <span class="text-indigo-400">Assinatura</span>
-                                        <span id="stat-perc-signing">0%</span>
-                                    </div>
-                                    <div class="w-full bg-slate-700 rounded-full h-2">
-                                        <div id="stat-bar-signing" class="bg-indigo-500 h-2 rounded-full" style="width: 0%"></div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="p-4 border-t border-slate-50 bg-slate-50/30">
+                            <button onclick="openModal('modal-reminder')" class="w-full py-2.5 rounded-xl border border-dashed border-slate-300 text-slate-500 text-sm font-medium hover:border-purple-300 hover:text-purple-600 hover:bg-purple-50 transition-all flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-plus"></i> Adicionar Nota Rápida
+                            </button>
                         </div>
-                        <!-- Decorative Circle -->
-                        <div class="absolute -top-10 -right-10 w-40 h-40 bg-slate-700 rounded-full opacity-30 blur-2xl"></div>
-                        <div class="absolute bottom-0 left-0 w-20 h-20 bg-brand-500 rounded-full opacity-10 blur-xl"></div>
                     </div>
+
                 </div>
             </div>
         </div>
 
-        <!-- ORDERS PAGE (MODERNIZED) -->
+        <!-- ORDERS PAGE -->
         <div id="page-orders" class="px-6 md:px-8 max-w-[1600px] mx-auto hidden fade-in">
             <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 mt-4">
                 <div>
@@ -350,10 +315,7 @@
                 </div>
                 <div class="h-auto w-px bg-slate-200 hidden md:block my-2"></div>
                 <select id="filter-status" onchange="filterOrders()" class="p-3 px-4 rounded-lg border-none focus:ring-0 bg-transparent font-medium text-slate-600 cursor-pointer hover:bg-slate-50 transition-colors">
-                    <option value="all">Todos os Status</option>
-                    <option value="entregue">Entregue</option>
-                    <option value="aguardando">Aguardando</option>
-                    <option value="assinatura">Assinatura</option>
+                    <!-- JS Filled -->
                 </select>
             </div>
 
@@ -419,7 +381,36 @@
             </div>
         </div>
 
-        <!-- SETTINGS PAGE (NOVO) -->
+        <!-- STATUS PAGE (NOVO) -->
+        <div id="page-status" class="px-6 md:px-8 max-w-[1600px] mx-auto hidden fade-in">
+            <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 mt-4">
+                <div>
+                    <h2 class="text-3xl font-bold text-slate-800">Cadastro de Status</h2>
+                    <p class="text-slate-500 mt-1">Personalize os estados das suas ordens.</p>
+                </div>
+                <button onclick="openModal('modal-status')" class="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-xl shadow-lg shadow-slate-200 hover:shadow-xl transition-all flex items-center gap-2 font-medium">
+                    <i class="fa-solid fa-plus"></i> Novo Status
+                </button>
+            </header>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-50 text-xs uppercase text-slate-400 font-semibold">
+                        <tr>
+                            <th class="px-6 py-4">Status</th>
+                            <th class="px-6 py-4 text-center">Cor</th>
+                            <th class="px-6 py-4 text-center">Ícone</th>
+                            <th class="px-6 py-4 text-right">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="status-table-body" class="divide-y divide-slate-100">
+                        <!-- JS Filled -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SETTINGS PAGE -->
         <div id="page-settings" class="px-6 md:px-8 max-w-4xl mx-auto hidden fade-in">
             <header class="mb-10 mt-4">
                 <h2 class="text-3xl font-bold text-slate-800">Configurações</h2>
@@ -501,9 +492,7 @@
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Situação Atual</label>
                         <div class="relative">
                             <select id="order-status" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium appearance-none">
-                                <option value="aguardando">Aguardando</option>
-                                <option value="assinatura">Em Assinatura</option>
-                                <option value="entregue">Entregue</option>
+                                <!-- Filled JS -->
                             </select>
                             <i class="fa-solid fa-chevron-down absolute right-4 top-4 text-slate-400 text-xs pointer-events-none"></i>
                         </div>
@@ -513,6 +502,64 @@
                 <div class="pt-4 flex justify-end gap-3 border-t border-slate-100">
                     <button type="button" onclick="closeModal('modal-order')" class="px-6 py-2.5 text-slate-600 hover:bg-slate-100 rounded-lg font-medium transition-colors">Cancelar</button>
                     <button type="submit" id="btn-save-order" class="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg shadow-lg shadow-slate-200 hover:shadow-xl font-medium transition-all">Salvar Ordem</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL STATUS -->
+    <div id="modal-status" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-slate-50">
+                <h3 class="font-bold text-xl text-slate-800">Gerenciar Status</h3>
+                <button onclick="closeModal('modal-status')" class="w-8 h-8 rounded-full hover:bg-gray-200 flex items-center justify-center text-slate-500 transition-colors"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <form id="form-status" onsubmit="saveStatus(event)" class="p-8 space-y-5">
+                <input type="hidden" id="status-id">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nome do Status</label>
+                    <input type="text" id="status-label" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium" placeholder="Ex: Em Análise">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Cor (Tema)</label>
+                    <select id="status-color" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium appearance-none">
+                        <option value="slate">Cinza (Padrão)</option>
+                        <option value="red">Vermelho (Urgente)</option>
+                        <option value="orange">Laranja (Atenção)</option>
+                        <option value="amber">Amarelo (Aguardando)</option>
+                        <option value="green">Verde (Sucesso)</option>
+                        <option value="emerald">Esmeralda (Entregue)</option>
+                        <option value="teal">Verde Água</option>
+                        <option value="cyan">Ciano</option>
+                        <option value="sky">Azul Céu</option>
+                        <option value="blue">Azul</option>
+                        <option value="indigo">Índigo (Assinatura)</option>
+                        <option value="violet">Violeta</option>
+                        <option value="purple">Roxo</option>
+                        <option value="fuchsia">Fúcsia</option>
+                        <option value="pink">Rosa</option>
+                        <option value="rose">Rosé</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Ícone (FontAwesome)</label>
+                    <select id="status-icon" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium appearance-none">
+                        <option value="fa-circle">Círculo (Padrão)</option>
+                        <option value="fa-clock">Relógio</option>
+                        <option value="fa-check">Check / Visto</option>
+                        <option value="fa-file-signature">Assinatura</option>
+                        <option value="fa-truck">Caminhão</option>
+                        <option value="fa-box">Caixa</option>
+                        <option value="fa-ban">Proibido / Cancelado</option>
+                        <option value="fa-triangle-exclamation">Alerta</option>
+                        <option value="fa-thumbs-up">Joinha</option>
+                        <option value="fa-magnifying-glass">Lupa</option>
+                        <option value="fa-user-clock">Usuário Aguardando</option>
+                    </select>
+                </div>
+                <div class="pt-4 flex justify-end gap-3 border-t border-slate-100">
+                    <button type="button" onclick="closeModal('modal-status')" class="px-6 py-2.5 text-slate-600 hover:bg-slate-100 rounded-lg font-medium transition-colors">Cancelar</button>
+                    <button type="submit" class="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-lg hover:shadow-xl font-medium transition-all">Salvar</button>
                 </div>
             </form>
         </div>
@@ -562,66 +609,167 @@
         // --- DATA STATE ---
         let orders = JSON.parse(localStorage.getItem('sys_orders')) || [];
         let reminders = JSON.parse(localStorage.getItem('sys_reminders')) || [];
+        let statuses = JSON.parse(localStorage.getItem('sys_statuses')) || [
+            { id: 'entregue', label: 'Entregue', color: 'emerald', icon: 'fa-check', isSystem: true },
+            { id: 'aguardando', label: 'Aguardando', color: 'amber', icon: 'fa-clock', isSystem: true },
+            { id: 'assinatura', label: 'Assinatura', color: 'indigo', icon: 'fa-file-signature', isSystem: true }
+        ];
+
         let pendingDeleteId = null;
+        let pendingDeleteType = null; 
+        let statusChartInstance = null;
 
         // --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
+            // Check data integrity
+            if (!Array.isArray(orders)) orders = [];
+            if (!Array.isArray(reminders)) reminders = [];
+            if (!Array.isArray(statuses)) statuses = [];
+
+            // Initialize all views
             renderOrders();
             renderReminders();
+            renderStatuses();
             updateDashboard();
             updateDateTime();
+            populateStatusSelects();
             
-            // Check notifications on load
+            // Check notifications permission
             if (Notification.permission === "granted") {
                 checkReminders();
+                checkDeliveries(); 
             } else if (Notification.permission !== "denied") {
-                document.getElementById('notification-dot').classList.remove('hidden');
+                const dot = document.getElementById('notification-dot');
+                if(dot) dot.classList.remove('hidden');
             }
 
             // Periodic updates
             setInterval(updateDateTime, 60000); 
-            setInterval(checkReminders, 60000); // Check reminders every minute
+            setInterval(() => {
+                checkReminders();
+                checkDeliveries(); 
+            }, 60000); 
         });
 
-        // --- LOGIN LOGIC ---
+        // --- NOTIFICATIONS ---
+        function requestNotificationPermission() {
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    const dot = document.getElementById('notification-dot');
+                    if(dot) dot.classList.add('hidden');
+                    new Notification("SysCompras", { body: "Notificações ativadas com sucesso!" });
+                    checkReminders();
+                    checkDeliveries();
+                } else {
+                    alert("Para receber alertas, você precisa permitir notificações nas configurações do navegador.");
+                }
+            });
+        }
+
+        function checkReminders() {
+            if (Notification.permission !== "granted") return;
+            
+            const today = new Date().toISOString().split('T')[0];
+            let changed = false;
+            
+            reminders.forEach(r => {
+                if (!r.done && r.date === today && !r.notified) {
+                    new Notification("Lembrete SysCompras", {
+                        body: r.text,
+                        icon: "https://cdn-icons-png.flaticon.com/512/1792/1792931.png"
+                    });
+                    r.notified = true; 
+                    changed = true;
+                }
+            });
+            if(changed) saveData();
+        }
+
+        function checkDeliveries() {
+            if (Notification.permission !== "granted") return;
+
+            const today = new Date().toISOString().split('T')[0];
+            let changed = false;
+
+            orders.forEach(o => {
+                if (o.status !== 'entregue' && o.date === today && !o.notified) {
+                    new Notification("Entrega Hoje!", {
+                        body: `${o.supplier} - ${o.product}\nSetor: ${o.sector || 'Geral'}`,
+                        icon: "https://cdn-icons-png.flaticon.com/512/2942/2942838.png"
+                    });
+                    o.notified = true; 
+                    changed = true;
+                }
+            });
+
+            if(changed) saveData();
+        }
+
+        // --- CLOCK & GREETING ---
+        function updateDateTime() {
+            const now = new Date();
+            
+            // Banner Date
+            const dateOptions = { weekday: 'long', day: 'numeric', month: 'long' };
+            const dateString = now.toLocaleDateString('pt-BR', dateOptions);
+            const bannerDate = document.getElementById('banner-date');
+            if(bannerDate) bannerDate.innerText = dateString.charAt(0).toUpperCase() + dateString.slice(1);
+
+            // Header Date
+            const shortDateOptions = { day: 'numeric', month: 'numeric', year: 'numeric' };
+            const headerDate = document.getElementById('header-date');
+            if(headerDate) headerDate.innerText = now.toLocaleDateString('pt-BR', shortDateOptions);
+            
+            // Time
+            const timeOptions = { hour: '2-digit', minute: '2-digit' };
+            const headerTime = document.getElementById('header-time');
+            if(headerTime) headerTime.innerText = now.toLocaleTimeString('pt-BR', timeOptions);
+
+            // Greeting
+            const hour = now.getHours();
+            let greeting = 'Bom dia';
+            if (hour >= 12 && hour < 18) greeting = 'Boa tarde';
+            else if (hour >= 18) greeting = 'Boa noite';
+            
+            const welcome = document.getElementById('welcome-msg');
+            if(welcome) welcome.innerText = `${greeting}, Admin`;
+        }
+
+        // --- LOGIN & LOGOUT ---
         function attemptLogin(e) {
             e.preventDefault();
             const pass = document.getElementById('login-password').value;
             const errorMsg = document.getElementById('login-error');
-            
             if(pass === '1234') {
                 document.getElementById('login-screen').classList.add('hidden');
-                // Opcional: Adicionar lógica para manter sessão, se necessário
             } else {
                 errorMsg.classList.remove('hidden');
-                document.getElementById('login-password').value = '';
-                document.getElementById('login-password').focus();
-                
-                // Hide error after 3 seconds
-                setTimeout(() => {
-                    errorMsg.classList.add('hidden');
-                }, 3000);
+                setTimeout(() => errorMsg.classList.add('hidden'), 3000);
             }
         }
-
-        // --- LOGOUT LOGIC ---
         function logout() {
             document.getElementById('login-screen').classList.remove('hidden');
             document.getElementById('login-password').value = '';
         }
 
-        // --- BACKUP & RESTORE LOGIC ---
+        // --- DATA PERSISTENCE ---
+        function saveData() {
+            localStorage.setItem('sys_orders', JSON.stringify(orders));
+            localStorage.setItem('sys_reminders', JSON.stringify(reminders));
+            localStorage.setItem('sys_statuses', JSON.stringify(statuses));
+            updateDashboard();
+        }
+
         function exportData() {
             const data = {
                 orders: orders,
                 reminders: reminders,
+                statuses: statuses,
                 timestamp: new Date().toISOString()
             };
-            
             const dataStr = JSON.stringify(data, null, 2);
             const blob = new Blob([dataStr], {type: "application/json"});
             const url = URL.createObjectURL(blob);
-            
             const a = document.createElement('a');
             a.href = url;
             a.download = `backup_syscompras_${new Date().toISOString().slice(0,10)}.json`;
@@ -634,139 +782,128 @@
         function importData(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
-                    const content = e.target.result;
-                    const parsedData = JSON.parse(content);
-
-                    if (parsedData.orders && Array.isArray(parsedData.orders)) {
+                    const parsedData = JSON.parse(e.target.result);
+                    if (parsedData.orders) {
                         if(confirm('Isso substituirá todos os dados atuais. Deseja continuar?')) {
-                            orders = parsedData.orders;
+                            orders = parsedData.orders || [];
                             reminders = parsedData.reminders || [];
+                            statuses = parsedData.statuses || statuses;
                             saveData();
-                            renderOrders();
-                            renderReminders();
-                            updateDashboard();
-                            alert('Backup restaurado com sucesso!');
+                            location.reload(); 
                         }
                     } else {
-                        alert('Arquivo de backup inválido.');
+                        alert('Arquivo inválido.');
                     }
                 } catch (error) {
-                    console.error(error);
-                    alert('Erro ao ler o arquivo. Verifique se é um JSON válido.');
+                    alert('Erro ao ler arquivo.');
                 }
-                // Clear input to allow re-uploading same file if needed
                 event.target.value = '';
             };
             reader.readAsText(file);
         }
 
-        // --- NOTIFICATIONS ---
-        function requestNotificationPermission() {
-            Notification.requestPermission().then(permission => {
-                if (permission === "granted") {
-                    document.getElementById('notification-dot').classList.add('hidden');
-                    new Notification("SysCompras", { body: "Notificações ativadas com sucesso!" });
-                    checkReminders();
-                } else {
-                    alert("Para receber alertas, você precisa permitir notificações nas configurações do navegador.");
+        // --- STATUS LOGIC ---
+        function saveStatus(e) {
+            e.preventDefault();
+            const id = document.getElementById('status-id').value;
+            const label = document.getElementById('status-label').value;
+            const color = document.getElementById('status-color').value;
+            const icon = document.getElementById('status-icon').value;
+
+            if (id) {
+                const index = statuses.findIndex(s => s.id === id);
+                if(index > -1) {
+                    statuses[index] = { ...statuses[index], label, color, icon };
                 }
-            });
-        }
-
-        function checkReminders() {
-            if (Notification.permission !== "granted") return;
-            
-            const today = new Date().toISOString().split('T')[0];
-            
-            reminders.forEach(r => {
-                // If reminder is for today, not done, and not notified yet
-                if (!r.done && r.date === today && !r.notified) {
-                    new Notification("Lembrete SysCompras", {
-                        body: r.text,
-                        icon: "https://cdn-icons-png.flaticon.com/512/1792/1792931.png"
-                    });
-                    
-                    // Mark as notified to avoid spamming
-                    r.notified = true; 
-                    saveData(); // Save the notified state
-                }
-            });
-        }
-
-        // --- CLOCK & GREETING ---
-        function updateDateTime() {
-            const now = new Date();
-            
-            // Date
-            const dateOptions = { day: 'numeric', month: 'numeric', year: 'numeric' };
-            document.getElementById('header-date').innerText = now.toLocaleDateString('pt-BR', dateOptions);
-            
-            // Time
-            const timeOptions = { hour: '2-digit', minute: '2-digit' };
-            document.getElementById('header-time').innerText = now.toLocaleTimeString('pt-BR', timeOptions);
-
-            // Greeting
-            const hour = now.getHours();
-            let greeting = 'Bom dia';
-            if (hour >= 12 && hour < 18) greeting = 'Boa tarde';
-            else if (hour >= 18) greeting = 'Boa noite';
-            
-            const welcome = document.getElementById('welcome-msg');
-            if(welcome) welcome.innerText = `${greeting}, Admin`;
-        }
-
-        // --- NAVIGATION ---
-        function toggleSidebar() {
-            const sidebar = document.getElementById('main-sidebar');
-            const overlay = document.getElementById('sidebar-overlay');
-            
-            if (sidebar.classList.contains('-translate-x-full')) {
-                sidebar.classList.remove('-translate-x-full');
-                overlay.classList.remove('hidden');
-                setTimeout(() => overlay.classList.remove('opacity-0'), 10);
             } else {
-                sidebar.classList.add('-translate-x-full');
-                overlay.classList.add('opacity-0');
-                setTimeout(() => overlay.classList.add('hidden'), 300);
+                let newId = label.toLowerCase().replace(/\s+/g, '-');
+                if(statuses.find(s => s.id === newId)) newId += '-' + Date.now();
+                statuses.push({ id: newId, label, color, icon, isSystem: false });
             }
+
+            saveData();
+            closeModal('modal-status');
+            renderStatuses();
+            populateStatusSelects(); 
+            updateDashboard(); 
+            renderOrders(); 
         }
 
-        function showPage(pageId) {
-            ['dashboard', 'orders', 'reminders', 'settings'].forEach(id => {
-                const page = document.getElementById(`page-${id}`);
-                if (page) page.classList.add('hidden');
+        function deleteStatus(id) {
+            const status = statuses.find(s => s.id === id);
+            if(status && status.isSystem) {
+                alert('Este status é padrão do sistema e não pode ser excluído.');
+                return;
+            }
+            pendingDeleteId = id;
+            pendingDeleteType = 'status';
+            openModal('modal-delete');
+        }
+
+        function editStatus(id) {
+            const status = statuses.find(s => s.id === id);
+            if(!status) return;
+
+            document.getElementById('status-id').value = status.id;
+            document.getElementById('status-label').value = status.label;
+            document.getElementById('status-color').value = status.color;
+            document.getElementById('status-icon').value = status.icon;
+            openModal('modal-status');
+        }
+
+        function renderStatuses() {
+            const tbody = document.getElementById('status-table-body');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+
+            statuses.forEach(s => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0";
+                const badgeClass = `bg-${s.color}-100 text-${s.color}-700`;
                 
-                const navBtn = document.getElementById(`nav-${id}`);
-                if(navBtn) {
-                    if (id === pageId) {
-                        navBtn.classList.add('bg-slate-50', 'text-brand-600', 'border-brand-200');
-                        navBtn.classList.remove('text-slate-600', 'border-transparent');
-                    } else {
-                        navBtn.classList.remove('bg-slate-50', 'text-brand-600', 'border-brand-200');
-                        navBtn.classList.add('text-slate-600', 'border-transparent');
-                    }
+                tr.innerHTML = `
+                    <td class="px-6 py-4 font-medium text-slate-700">${s.label} ${s.isSystem ? '<i class="fa-solid fa-lock text-xs text-slate-300 ml-2" title="Sistema"></i>' : ''}</td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="px-3 py-1 rounded-full text-xs font-bold uppercase ${badgeClass}">${s.color}</span>
+                    </td>
+                    <td class="px-6 py-4 text-center text-slate-500"><i class="fa-solid ${s.icon}"></i></td>
+                    <td class="px-6 py-4 text-right space-x-2">
+                        <button onclick="editStatus('${s.id}')" class="text-blue-500 hover:bg-blue-50 p-2 rounded"><i class="fa-solid fa-pen"></i></button>
+                        ${!s.isSystem ? `<button onclick="deleteStatus('${s.id}')" class="text-red-500 hover:bg-red-50 p-2 rounded"><i class="fa-solid fa-trash"></i></button>` : ''}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function populateStatusSelects() {
+            const selects = [document.getElementById('order-status'), document.getElementById('filter-status')];
+            selects.forEach(sel => {
+                if(!sel) return;
+                const currentVal = sel.value; 
+                sel.innerHTML = '';
+                
+                if(sel.id === 'filter-status') {
+                    const allOpt = document.createElement('option');
+                    allOpt.value = 'all';
+                    allOpt.text = 'Todos os Status';
+                    sel.appendChild(allOpt);
+                }
+
+                statuses.forEach(s => {
+                    const opt = document.createElement('option');
+                    opt.value = s.id;
+                    opt.text = s.label;
+                    sel.appendChild(opt);
+                });
+
+                if(currentVal && (currentVal === 'all' || statuses.find(s => s.id === currentVal))) {
+                    sel.value = currentVal;
                 }
             });
-
-            const targetPage = document.getElementById(`page-${pageId}`);
-            if (targetPage) targetPage.classList.remove('hidden');
-            
-            if (pageId === 'dashboard') updateDashboard();
-        }
-
-        // --- MODALS ---
-        function openModal(id) {
-            document.getElementById(id).classList.remove('hidden');
-            if(id === 'modal-reminder') document.getElementById('form-reminder').reset();
-        }
-
-        function closeModal(id) {
-            document.getElementById(id).classList.add('hidden');
-            if (id === 'modal-delete') pendingDeleteId = null;
         }
 
         // --- ORDER LOGIC ---
@@ -776,10 +913,11 @@
             document.getElementById('modal-title').innerText = 'Nova Ordem';
             document.getElementById('btn-save-order').innerText = 'Salvar Ordem';
             
-            // Set current time automatically
             const now = new Date();
             const timeStr = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
             document.getElementById('order-creation-time').value = timeStr;
+            
+            if(statuses.length > 0) document.getElementById('order-status').value = statuses[0].id;
             
             openModal('modal-order');
         }
@@ -791,9 +929,9 @@
             const orderData = {
                 id: id ? parseInt(id) : Date.now(),
                 number: document.getElementById('order-num').value,
-                creationTime: document.getElementById('order-creation-time').value, // Save time
+                creationTime: document.getElementById('order-creation-time').value, 
                 supplier: document.getElementById('order-supplier').value,
-                sector: document.getElementById('order-sector').value, // Save sector
+                sector: document.getElementById('order-sector').value, 
                 product: document.getElementById('order-product').value,
                 date: document.getElementById('order-date').value,
                 status: document.getElementById('order-status').value,
@@ -802,13 +940,12 @@
 
             if (id) {
                 const index = orders.findIndex(o => o.id == id);
-                // Keep original creation time if editing
-                const originalCreationTime = orders[index].creationTime;
-                orders[index] = orderData; 
-                // Restore original creation time so it doesn't overwrite with edit time (unless desired, but usually creation time is static)
-                if(originalCreationTime) orders[index].creationTime = originalCreationTime; 
-                // If editing, timestamp updates for "recent activity" logic
-                orders[index].timestamp = Date.now();
+                if (index > -1) {
+                    const originalCreationTime = orders[index].creationTime;
+                    orders[index] = orderData; 
+                    if(originalCreationTime) orders[index].creationTime = originalCreationTime; 
+                    orders[index].timestamp = Date.now();
+                }
             } else {
                 orders.push(orderData);
             }
@@ -820,15 +957,27 @@
 
         function deleteOrder(id) {
             pendingDeleteId = id;
+            pendingDeleteType = 'order';
             openModal('modal-delete');
         }
 
         function confirmDelete() {
             if (pendingDeleteId) {
-                orders = orders.filter(o => o.id !== pendingDeleteId);
+                if(pendingDeleteType === 'order') {
+                    orders = orders.filter(o => o.id !== pendingDeleteId);
+                } else if (pendingDeleteType === 'reminder') {
+                    reminders = reminders.filter(r => r.id !== pendingDeleteId);
+                } else if (pendingDeleteType === 'status') {
+                    statuses = statuses.filter(s => s.id !== pendingDeleteId);
+                    populateStatusSelects();
+                    renderStatuses();
+                }
                 saveData();
                 renderOrders();
+                renderReminders();
+                updateDashboard();
                 pendingDeleteId = null;
+                pendingDeleteType = null;
             }
             closeModal('modal-delete');
         }
@@ -839,9 +988,9 @@
 
             document.getElementById('order-id').value = order.id;
             document.getElementById('order-num').value = order.number;
-            document.getElementById('order-creation-time').value = order.creationTime || ''; // Load time
+            document.getElementById('order-creation-time').value = order.creationTime || ''; 
             document.getElementById('order-supplier').value = order.supplier;
-            document.getElementById('order-sector').value = order.sector || ''; // Load sector
+            document.getElementById('order-sector').value = order.sector || ''; 
             document.getElementById('order-product').value = order.product;
             document.getElementById('order-date').value = order.date;
             document.getElementById('order-status').value = order.status;
@@ -865,15 +1014,27 @@
             }
         }
 
+        function getStatusConfig(statusId) {
+            const s = statuses.find(item => item.id === statusId) || { color: 'slate' };
+            return {
+                textClass: `text-${s.color}-600`,
+                dotClass: `bg-${s.color}-500`,
+                bgClass: `bg-${s.color}-500`
+            };
+        }
+
         function renderOrders() {
-            const search = document.getElementById('search-order').value.toLowerCase();
-            const filter = document.getElementById('filter-status').value;
+            const searchInput = document.getElementById('search-order');
+            const filterInput = document.getElementById('filter-status');
+            
+            const search = searchInput ? searchInput.value.toLowerCase() : '';
+            const filter = filterInput ? filterInput.value : 'all';
             
             const desktopBody = document.getElementById('orders-desktop-body');
             const mobileGrid = document.getElementById('orders-mobile-grid');
             
-            desktopBody.innerHTML = '';
-            mobileGrid.innerHTML = '';
+            if(desktopBody) desktopBody.innerHTML = '';
+            if(mobileGrid) mobileGrid.innerHTML = '';
 
             const filtered = orders.filter(o => {
                 const matchesSearch = o.supplier.toLowerCase().includes(search) || 
@@ -883,130 +1044,115 @@
                 return matchesSearch && matchesFilter;
             });
 
+            const emptyState = document.getElementById('empty-state');
             if (filtered.length === 0) {
-                document.getElementById('empty-state').classList.remove('hidden');
+                if(emptyState) emptyState.classList.remove('hidden');
             } else {
-                document.getElementById('empty-state').classList.add('hidden');
+                if(emptyState) emptyState.classList.add('hidden');
                 
                 filtered.forEach(o => {
                     const statusConfig = getStatusConfig(o.status);
                     const initial = o.supplier.charAt(0).toUpperCase();
                     const timeDisplay = o.creationTime ? `<span class="block text-[10px] text-slate-400 mt-0.5 font-normal">Criado às ${o.creationTime}</span>` : '';
                     
+                    let optionsHtml = '';
+                    statuses.forEach(s => {
+                        optionsHtml += `<option value="${s.id}" ${o.status === s.id ? 'selected' : ''}>${s.label}</option>`;
+                    });
+
                     // --- DESKTOP ROW ---
-                    const tr = document.createElement('tr');
-                    tr.className = "bg-white shadow-sm rounded-xl hover:shadow-md transition-shadow group";
-                    tr.innerHTML = `
-                        <td class="p-4 pl-6 first:rounded-l-xl font-semibold text-slate-700 text-center align-middle">
-                            <div class="flex flex-col items-center justify-center">
-                                <span><span class="text-slate-400 mr-1">#</span>${o.number}</span>
-                                ${timeDisplay}
-                            </div>
-                        </td>
-                        <td class="p-4 align-middle">
-                            <div class="flex items-center justify-center gap-3">
-                                <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 font-bold flex items-center justify-center text-xs border border-slate-200">
-                                    ${initial}
+                    if (desktopBody) {
+                        const tr = document.createElement('tr');
+                        tr.className = "bg-white shadow-sm rounded-xl hover:shadow-md transition-shadow group";
+                        tr.innerHTML = `
+                            <td class="p-4 pl-6 first:rounded-l-xl font-semibold text-slate-700 text-center align-middle">
+                                <div class="flex flex-col items-center justify-center">
+                                    <span><span class="text-slate-400 mr-1">#</span>${o.number}</span>
+                                    ${timeDisplay}
                                 </div>
-                                <span class="font-medium text-slate-700">${o.supplier}</span>
-                            </div>
-                        </td>
-                        <td class="p-4 text-slate-600 font-medium text-center align-middle">${o.sector || '-'}</td>
-                        <td class="p-4 text-slate-600 font-medium text-center align-middle">${o.product}</td>
-                        <td class="p-4 text-slate-500 text-sm text-center align-middle">
-                            <div class="flex items-center justify-center">
-                                <i class="fa-regular fa-calendar mr-2 text-slate-300"></i>${formatDate(o.date)}
-                            </div>
-                        </td>
-                        <td class="p-4 text-center align-middle">
-                            <div class="relative inline-block w-full max-w-[140px] mx-auto">
-                                <div class="absolute inset-y-0 left-0 flex items-center pl-2 pointer-events-none">
-                                    <div class="w-2 h-2 rounded-full ${statusConfig.dotClass}"></div>
+                            </td>
+                            <td class="p-4 align-middle">
+                                <div class="flex items-center justify-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 font-bold flex items-center justify-center text-xs border border-slate-200">
+                                        ${initial}
+                                    </div>
+                                    <span class="font-medium text-slate-700">${o.supplier}</span>
                                 </div>
-                                <select onchange="updateOrderStatus(${o.id}, this.value)" 
-                                        class="w-full appearance-none pl-6 py-1.5 pr-8 rounded-lg text-xs font-bold border border-transparent hover:bg-slate-50 focus:outline-none cursor-pointer transition-all ${statusConfig.textClass}">
-                                    <option value="aguardando" ${o.status === 'aguardando' ? 'selected' : ''}>Aguardando</option>
-                                    <option value="assinatura" ${o.status === 'assinatura' ? 'selected' : ''}>Assinatura</option>
-                                    <option value="entregue" ${o.status === 'entregue' ? 'selected' : ''}>Entregue</option>
-                                </select>
-                            </div>
-                        </td>
-                        <td class="p-4 pr-6 text-right align-middle last:rounded-r-xl">
-                            <div class="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button onclick="editOrder(${o.id})" class="w-8 h-8 rounded-lg text-slate-400 hover:text-brand-600 hover:bg-brand-50 transition-colors" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                                <button onclick="deleteOrder(${o.id})" class="w-8 h-8 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors" title="Excluir"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </td>
-                    `;
-                    desktopBody.appendChild(tr);
+                            </td>
+                            <td class="p-4 text-slate-600 font-medium text-center align-middle">${o.sector || '-'}</td>
+                            <td class="p-4 text-slate-600 font-medium text-center align-middle">${o.product}</td>
+                            <td class="p-4 text-slate-500 text-sm text-center align-middle">
+                                <div class="flex items-center justify-center">
+                                    <i class="fa-regular fa-calendar mr-2 text-slate-300"></i>${formatDate(o.date)}
+                                </div>
+                            </td>
+                            <td class="p-4 text-center align-middle">
+                                <div class="relative inline-block w-full max-w-[140px] mx-auto">
+                                    <div class="absolute inset-y-0 left-0 flex items-center pl-2 pointer-events-none">
+                                        <div class="w-2 h-2 rounded-full ${statusConfig.dotClass}"></div>
+                                    </div>
+                                    <select onchange="updateOrderStatus(${o.id}, this.value)" 
+                                            class="w-full appearance-none pl-6 py-1.5 pr-8 rounded-lg text-xs font-bold border border-transparent hover:bg-slate-50 focus:outline-none cursor-pointer transition-all ${statusConfig.textClass}">
+                                        ${optionsHtml}
+                                    </select>
+                                </div>
+                            </td>
+                            <td class="p-4 pr-6 text-right align-middle last:rounded-r-xl">
+                                <div class="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button onclick="editOrder(${o.id})" class="w-8 h-8 rounded-lg text-slate-400 hover:text-brand-600 hover:bg-brand-50 transition-colors" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                                    <button onclick="deleteOrder(${o.id})" class="w-8 h-8 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                                </div>
+                            </td>
+                        `;
+                        desktopBody.appendChild(tr);
+                    }
 
                     // --- MOBILE CARD ---
-                    const card = document.createElement('div');
-                    card.className = "bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-col gap-4";
-                    card.innerHTML = `
-                        <div class="flex justify-between items-start">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full bg-slate-50 text-slate-600 font-bold flex items-center justify-center border border-slate-100">
-                                    ${initial}
+                    if (mobileGrid) {
+                        const card = document.createElement('div');
+                        card.className = "bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-col gap-4";
+                        card.innerHTML = `
+                            <div class="flex justify-between items-start">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-slate-50 text-slate-600 font-bold flex items-center justify-center border border-slate-100">
+                                        ${initial}
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-slate-800 leading-tight">${o.supplier}</h4>
+                                        <span class="text-xs text-slate-400 font-medium">#${o.number} ${o.creationTime ? ' • ' + o.creationTime : ''}</span>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h4 class="font-bold text-slate-800 leading-tight">${o.supplier}</h4>
-                                    <span class="text-xs text-slate-400 font-medium">#${o.number} ${o.creationTime ? ' • ' + o.creationTime : ''}</span>
+                                <div class="relative">
+                                    <select onchange="updateOrderStatus(${o.id}, this.value)" 
+                                            class="appearance-none pl-3 py-1 pr-6 rounded-lg text-xs font-bold border border-slate-100 bg-slate-50 focus:outline-none cursor-pointer ${statusConfig.textClass}">
+                                        ${optionsHtml}
+                                    </select>
                                 </div>
                             </div>
-                            <div class="relative">
-                                <select onchange="updateOrderStatus(${o.id}, this.value)" 
-                                        class="appearance-none pl-3 py-1 pr-6 rounded-lg text-xs font-bold border border-slate-100 bg-slate-50 focus:outline-none cursor-pointer ${statusConfig.textClass}">
-                                    <option value="aguardando" ${o.status === 'aguardando' ? 'selected' : ''}>Aguardando</option>
-                                    <option value="assinatura" ${o.status === 'assinatura' ? 'selected' : ''}>Assinatura</option>
-                                    <option value="entregue" ${o.status === 'entregue' ? 'selected' : ''}>Entregue</option>
-                                </select>
+                            
+                            <div class="grid grid-cols-2 gap-2 text-sm">
+                                <div class="bg-slate-50 p-2 rounded-lg">
+                                    <p class="text-xs text-slate-400 uppercase font-bold mb-1">Setor</p>
+                                    <p class="text-slate-700 font-medium truncate">${o.sector || '-'}</p>
+                                </div>
+                                <div class="bg-slate-50 p-2 rounded-lg">
+                                    <p class="text-xs text-slate-400 uppercase font-bold mb-1">Entrega</p>
+                                    <p class="text-slate-700 font-medium">${formatDate(o.date)}</p>
+                                </div>
+                                <div class="bg-slate-50 p-2 rounded-lg col-span-2">
+                                    <p class="text-xs text-slate-400 uppercase font-bold mb-1">Produto</p>
+                                    <p class="text-slate-700 font-medium truncate">${o.product}</p>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div class="grid grid-cols-2 gap-2 text-sm">
-                            <div class="bg-slate-50 p-2 rounded-lg">
-                                <p class="text-xs text-slate-400 uppercase font-bold mb-1">Setor</p>
-                                <p class="text-slate-700 font-medium truncate">${o.sector || '-'}</p>
-                            </div>
-                            <div class="bg-slate-50 p-2 rounded-lg">
-                                <p class="text-xs text-slate-400 uppercase font-bold mb-1">Entrega</p>
-                                <p class="text-slate-700 font-medium">${formatDate(o.date)}</p>
-                            </div>
-                            <div class="bg-slate-50 p-2 rounded-lg col-span-2">
-                                <p class="text-xs text-slate-400 uppercase font-bold mb-1">Produto</p>
-                                <p class="text-slate-700 font-medium truncate">${o.product}</p>
-                            </div>
-                        </div>
 
-                        <div class="flex justify-end gap-2 border-t border-slate-50 pt-3">
-                            <button onclick="editOrder(${o.id})" class="text-xs font-bold text-slate-500 hover:text-brand-600 px-3 py-2 rounded-lg hover:bg-slate-50">EDITAR</button>
-                            <button onclick="deleteOrder(${o.id})" class="text-xs font-bold text-slate-500 hover:text-red-500 px-3 py-2 rounded-lg hover:bg-slate-50">EXCLUIR</button>
-                        </div>
-                    `;
-                    mobileGrid.appendChild(card);
+                            <div class="flex justify-end gap-2 border-t border-slate-50 pt-3">
+                                <button onclick="editOrder(${o.id})" class="text-xs font-bold text-slate-500 hover:text-brand-600 px-3 py-2 rounded-lg hover:bg-slate-50">EDITAR</button>
+                                <button onclick="deleteOrder(${o.id})" class="text-xs font-bold text-slate-500 hover:text-red-500 px-3 py-2 rounded-lg hover:bg-slate-50">EXCLUIR</button>
+                            </div>
+                        `;
+                        mobileGrid.appendChild(card);
+                    }
                 });
-            }
-        }
-
-        function getStatusConfig(status) {
-            switch(status) {
-                case 'entregue': return { 
-                    textClass: 'text-emerald-600', 
-                    dotClass: 'bg-emerald-500'
-                };
-                case 'aguardando': return { 
-                    textClass: 'text-amber-600', 
-                    dotClass: 'bg-amber-500'
-                };
-                case 'assinatura': return { 
-                    textClass: 'text-indigo-600', 
-                    dotClass: 'bg-indigo-500'
-                };
-                default: return { 
-                    textClass: 'text-slate-600', 
-                    dotClass: 'bg-slate-400'
-                };
             }
         }
 
@@ -1021,13 +1167,13 @@
                 text,
                 date,
                 done: false,
-                notified: false // Added notified flag
+                notified: false 
             });
 
             saveData();
             closeModal('modal-reminder');
             renderReminders();
-            checkReminders(); // Check immediately
+            checkReminders(); 
         }
 
         function deleteReminder(id) {
@@ -1044,133 +1190,287 @@
         }
 
         function renderReminders() {
-            // Render on Reminders Page
             const grid = document.getElementById('reminders-grid');
-            grid.innerHTML = '';
+            if (grid) grid.innerHTML = '';
+            
+            const dashboardList = document.getElementById('dashboard-reminders-list');
+            if (dashboardList) dashboardList.innerHTML = '';
+
+            const emptyState = document.getElementById('reminders-empty');
             
             if(reminders.length === 0) {
-                document.getElementById('reminders-empty').classList.remove('hidden');
-            } else {
-                document.getElementById('reminders-empty').classList.add('hidden');
-                
-                reminders.forEach(r => {
-                    const div = document.createElement('div');
-                    div.className = `bg-white p-6 rounded-2xl shadow-sm border transition-all duration-300 ${r.done ? 'border-slate-100 opacity-60' : 'border-purple-100 hover:shadow-md hover:-translate-y-1'}`;
-                    div.innerHTML = `
-                        <div class="flex items-start gap-4">
-                            <button onclick="toggleReminder(${r.id})" class="mt-1 flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${r.done ? 'bg-purple-400 border-purple-400 text-white' : 'border-slate-300 text-transparent hover:border-purple-400'}">
-                                <i class="fa-solid fa-check text-xs"></i>
-                            </button>
-                            <div class="flex-1">
-                                <p class="${r.done ? 'line-through text-slate-400' : 'text-slate-800'} font-medium text-lg leading-snug">${r.text}</p>
-                                ${r.date ? `<p class="text-xs ${r.done ? 'text-slate-300' : 'text-purple-600/70'} mt-3 font-medium flex items-center gap-1"><i class="fa-regular fa-calendar"></i> ${formatDate(r.date)}</p>` : ''}
+                if(emptyState) emptyState.classList.remove('hidden');
+                if(dashboardList) {
+                    dashboardList.innerHTML = `
+                        <div class="flex flex-col items-center justify-center text-slate-400 h-full py-8">
+                            <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-3">
+                                <i class="fa-solid fa-mug-hot text-2xl text-slate-300"></i>
                             </div>
-                            <button onclick="deleteReminder(${r.id})" class="text-slate-300 hover:text-red-400 transition-colors"><i class="fa-solid fa-times"></i></button>
+                            <p class="text-sm font-medium">Tudo tranquilo por aqui!</p>
+                            <p class="text-xs opacity-60">Nenhum lembrete pendente.</p>
                         </div>
                     `;
-                    grid.appendChild(div);
+                }
+            } else {
+                if(emptyState) emptyState.classList.add('hidden');
+                
+                reminders.forEach(r => {
+                    // Render in Reminders Page
+                    if (grid) {
+                        const div = document.createElement('div');
+                        div.className = "bg-purple-50 rounded-lg p-3 border border-purple-100 flex items-start gap-3";
+                        div.innerHTML = `
+                             <button onclick="toggleReminder(${r.id})" class="mt-1 flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${r.done ? 'bg-purple-400 border-purple-400 text-white' : 'border-slate-300 text-transparent hover:border-purple-400'}">
+                                <i class="fa-solid fa-check text-xs"></i>
+                            </button>
+                             <div class="flex-1">
+                                <p class="text-sm font-medium text-slate-700 leading-snug line-clamp-2 ${r.done ? 'line-through text-slate-400' : ''}">${r.text}</p>
+                                ${r.date ? `<p class="text-[10px] text-purple-600/70 font-bold mt-1">${formatDate(r.date)}</p>` : ''}
+                             </div>
+                             <button onclick="deleteReminder(${r.id})" class="text-slate-300 hover:text-red-400 transition-colors"><i class="fa-solid fa-times"></i></button>
+                        `;
+                        grid.appendChild(div);
+                    }
                 });
+
+                // Render in Dashboard (Top 3 Pending)
+                if (dashboardList) {
+                    const pendingReminders = reminders.filter(r => !r.done).slice(0, 3);
+                    if (pendingReminders.length > 0) {
+                        pendingReminders.forEach(r => {
+                            const div = document.createElement('div');
+                            div.className = "bg-white p-4 rounded-xl border border-slate-100 shadow-[0_2px_8px_rgba(0,0,0,0.02)] group hover:border-purple-200 hover:shadow-md transition-all cursor-pointer";
+                            div.onclick = () => showPage('reminders');
+                            div.innerHTML = `
+                                 <div class="flex items-start gap-3">
+                                     <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-500 flex items-center justify-center flex-shrink-0 group-hover:bg-purple-500 group-hover:text-white transition-colors">
+                                        <i class="fa-solid fa-thumbtack text-xs"></i>
+                                     </div>
+                                     <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-semibold text-slate-700 leading-tight group-hover:text-purple-700 transition-colors line-clamp-2">${r.text}</p>
+                                        ${r.date ? `<p class="text-[10px] text-slate-400 mt-1 font-medium"><i class="fa-regular fa-clock mr-1"></i>${formatDate(r.date)}</p>` : ''}
+                                     </div>
+                                 </div>
+                            `;
+                            dashboardList.appendChild(div);
+                        });
+                    } else {
+                        dashboardList.innerHTML = `
+                            <div class="flex flex-col items-center justify-center text-slate-400 h-full py-8">
+                                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-3">
+                                    <i class="fa-solid fa-mug-hot text-2xl text-slate-300"></i>
+                                </div>
+                                <p class="text-sm font-medium">Tudo tranquilo por aqui!</p>
+                                <p class="text-xs opacity-60">Nenhum lembrete pendente.</p>
+                            </div>
+                        `;
+                    }
+                }
             }
         }
 
         // --- DASHBOARD LOGIC ---
         function updateDashboard() {
-            // 1. Stats Calculation
+            // 1. Calculate counts
+            const counts = {};
+            statuses.forEach(s => counts[s.id] = 0);
+            orders.forEach(o => {
+                if(counts[o.status] !== undefined) counts[o.status]++;
+            });
+
             const total = orders.length;
-            const delivered = orders.filter(o => o.status === 'entregue').length;
-            const waiting = orders.filter(o => o.status === 'aguardando').length;
-            const signing = orders.filter(o => o.status === 'assinatura').length;
+            const safeTotal = total > 0 ? total : 1;
 
-            // 3. Update Text Counters
-            animateValue("kpi-delivered", parseInt(document.getElementById("kpi-delivered").innerText), delivered, 800);
-            animateValue("kpi-waiting", parseInt(document.getElementById("kpi-waiting").innerText), waiting, 800);
-            animateValue("kpi-signing", parseInt(document.getElementById("kpi-signing").innerText), signing, 800);
-
-            // 4. Update Progress Bars
-            const safeTotal = total > 0 ? total : 1; // Avoid division by zero
-            document.getElementById('bar-delivered').style.width = `${(delivered/safeTotal)*100}%`;
-            document.getElementById('bar-waiting').style.width = `${(waiting/safeTotal)*100}%`;
-            document.getElementById('bar-signing').style.width = `${(signing/safeTotal)*100}%`;
-
-            // 5. Update Side Panel Stats
-            document.getElementById('stat-perc-delivered').innerText = `${Math.round((delivered/safeTotal)*100)}%`;
-            document.getElementById('stat-bar-delivered').style.width = `${(delivered/safeTotal)*100}%`;
-            
-            document.getElementById('stat-perc-waiting').innerText = `${Math.round((waiting/safeTotal)*100)}%`;
-            document.getElementById('stat-bar-waiting').style.width = `${(waiting/safeTotal)*100}%`;
-            
-            document.getElementById('stat-perc-signing').innerText = `${Math.round((signing/safeTotal)*100)}%`;
-            document.getElementById('stat-bar-signing').style.width = `${(signing/safeTotal)*100}%`;
-
-
-            // 6. Upcoming Deliveries (Next 7 days)
-            const upcomingBody = document.getElementById('upcoming-deliveries-body');
-            upcomingBody.innerHTML = '';
-            
-            const today = new Date();
-            today.setHours(0,0,0,0);
-            const nextWeek = new Date(today);
-            nextWeek.setDate(today.getDate() + 7);
-
-            const upcomingOrders = orders.filter(o => {
-                if(!o.date) return false;
-                // Parse date string (YYYY-MM-DD) manually to avoid timezone issues
-                const [y, m, d] = o.date.split('-').map(Number);
-                const orderDate = new Date(y, m - 1, d); 
-                return orderDate >= today && orderDate <= nextWeek && o.status !== 'entregue';
-            }).sort((a,b) => new Date(a.date) - new Date(b.date));
-
-            if(upcomingOrders.length > 0) {
-                document.getElementById('upcoming-empty').classList.add('hidden');
-                upcomingOrders.forEach(o => {
-                    const tr = document.createElement('tr');
-                    tr.className = "hover:bg-slate-50 transition-colors";
-                    tr.innerHTML = `
-                        <td class="px-6 py-3 font-medium text-slate-700">${formatDate(o.date)}</td>
-                        <td class="px-6 py-3 text-slate-600">${o.supplier}</td>
-                        <td class="px-6 py-3 text-slate-500">${o.product}</td>
+            // 2. Dynamic Cards
+            const kpiGrid = document.getElementById('kpi-grid');
+            if (kpiGrid) {
+                kpiGrid.innerHTML = '';
+                
+                statuses.forEach(s => {
+                    const count = counts[s.id];
+                    const percent = Math.round((count / safeTotal) * 100);
+                    
+                    const div = document.createElement('div');
+                    div.className = "bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group";
+                    div.innerHTML = `
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <p class="text-xs font-bold text-${s.color}-600/70 uppercase tracking-wider">${s.label}</p>
+                                <h3 class="text-3xl font-extrabold text-slate-800 mt-1">${count}</h3>
+                            </div>
+                            <div class="w-10 h-10 rounded-xl bg-${s.color}-50 text-${s.color}-600 flex items-center justify-center text-lg group-hover:scale-110 transition-transform">
+                                <i class="fa-solid ${s.icon}"></i>
+                            </div>
+                        </div>
+                        <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mb-2">
+                            <div class="h-full bg-${s.color}-500 rounded-full" style="width: ${percent}%"></div>
+                        </div>
+                        <p class="text-xs text-slate-400 text-right">${percent}% do total</p>
                     `;
-                    upcomingBody.appendChild(tr);
+                    kpiGrid.appendChild(div);
                 });
-            } else {
-                document.getElementById('upcoming-empty').classList.remove('hidden');
+
+                // Add Lembretes Card
+                const pendingRemindersCount = reminders.filter(r => !r.done).length;
+                const remDiv = document.createElement('div');
+                remDiv.className = "bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group";
+                remDiv.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-xs font-bold text-purple-600/70 uppercase tracking-wider">Lembretes Ativos</p>
+                            <h3 class="text-3xl font-extrabold text-slate-800 mt-1">${pendingRemindersCount}</h3>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-lg group-hover:scale-110 transition-transform">
+                            <i class="fa-regular fa-bell"></i>
+                        </div>
+                    </div>
+                    <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mb-2">
+                        <div class="h-full bg-purple-500 rounded-full w-full opacity-50"></div>
+                    </div>
+                    <p class="text-xs text-slate-400 flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> Sistema Operacional
+                    </p>
+                `;
+                kpiGrid.appendChild(remDiv);
             }
 
-            // 7. Dashboard Reminders (Top 4 Pending)
-            const dashboardRemindersList = document.getElementById('dashboard-reminders-list');
-            dashboardRemindersList.innerHTML = '';
-            const pendingReminders = reminders.filter(r => !r.done).slice(0, 4);
+            // 3. Update Chart
+            const ctx = document.getElementById('statusChart');
+            if (ctx) {
+                const labels = statuses.map(s => s.label);
+                const data = statuses.map(s => counts[s.id]);
+                
+                const colorMap = {
+                    emerald: '#10b981', amber: '#f59e0b', indigo: '#6366f1',
+                    slate: '#64748b', red: '#ef4444', orange: '#f97316',
+                    green: '#22c55e', teal: '#14b8a6', cyan: '#06b6d4',
+                    sky: '#0ea5e9', blue: '#3b82f6', violet: '#8b5cf6',
+                    purple: '#a855f7', fuchsia: '#d946ef', pink: '#ec4899', rose: '#f43f5e'
+                };
 
-            if (pendingReminders.length > 0) {
-                pendingReminders.forEach(r => {
-                    const div = document.createElement('div');
-                    div.className = "bg-purple-50 rounded-lg p-3 border border-purple-100 flex items-start gap-3";
-                    div.innerHTML = `
-                         <i class="fa-regular fa-clock text-purple-500 mt-1"></i>
-                         <div class="flex-1">
-                            <p class="text-sm font-medium text-slate-700 leading-snug line-clamp-2">${r.text}</p>
-                            ${r.date ? `<p class="text-[10px] text-purple-600/70 font-bold mt-1">${formatDate(r.date)}</p>` : ''}
-                         </div>
-                    `;
-                    dashboardRemindersList.appendChild(div);
-                });
-            } else {
-                dashboardRemindersList.innerHTML = `
-                    <div class="col-span-2 flex flex-col items-center justify-center text-slate-300 py-4">
-                        <i class="fa-solid fa-mug-hot text-xl mb-1"></i>
-                        <p class="text-xs">Tudo em dia!</p>
-                    </div>
-                `;
+                const chartColors = statuses.map(s => colorMap[s.color] || '#64748b');
+
+                if (statusChartInstance) {
+                    statusChartInstance.data.labels = labels;
+                    statusChartInstance.data.datasets[0].data = data;
+                    statusChartInstance.data.datasets[0].backgroundColor = chartColors;
+                    statusChartInstance.data.datasets[0].borderColor = chartColors;
+                    statusChartInstance.update();
+                } else {
+                    const ctx2d = ctx.getContext('2d');
+                    statusChartInstance = new Chart(ctx2d, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Quantidade',
+                                data: data,
+                                backgroundColor: chartColors,
+                                borderColor: chartColors,
+                                borderWidth: 0,
+                                borderRadius: 8, 
+                                borderSkipped: false,
+                                barThickness: 40,
+                                maxBarThickness: 50
+                            }]
+                        },
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                                    titleColor: '#f8fafc',
+                                    bodyColor: '#f8fafc',
+                                    padding: 14,
+                                    cornerRadius: 12,
+                                    displayColors: true,
+                                    usePointStyle: true,
+                                    callbacks: { title: () => '' }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    beginAtZero: true,
+                                    grid: { color: '#f1f5f9', drawBorder: false },
+                                    ticks: { font: { family: "'Inter', sans-serif", size: 11 }, color: '#94a3b8' },
+                                    border: { display: false }
+                                },
+                                y: {
+                                    grid: { display: false, drawBorder: false },
+                                    ticks: { font: { family: "'Inter', sans-serif", size: 11, weight: '600' }, color: '#64748b' },
+                                    border: { display: false }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
+            // 4. Upcoming Deliveries
+            const upcomingBody = document.getElementById('upcoming-deliveries-body');
+            if (upcomingBody) {
+                upcomingBody.innerHTML = '';
+                
+                const today = new Date();
+                today.setHours(0,0,0,0);
+                const nextWeek = new Date(today);
+                nextWeek.setDate(today.getDate() + 7);
+
+                const upcomingOrders = orders.filter(o => {
+                    if(!o.date) return false;
+                    const [y, m, d] = o.date.split('-').map(Number);
+                    const orderDate = new Date(y, m - 1, d); 
+                    return orderDate >= today && orderDate <= nextWeek && o.status !== 'entregue';
+                }).sort((a,b) => new Date(a.date) - new Date(b.date));
+
+                if(upcomingOrders.length > 0) {
+                    document.getElementById('upcoming-empty').classList.add('hidden');
+                    upcomingOrders.slice(0, 5).forEach(o => {
+                        const tr = document.createElement('tr');
+                        tr.className = "hover:bg-slate-50 transition-colors group cursor-default border-b border-slate-50 last:border-0";
+                        const initial = o.supplier.charAt(0).toUpperCase();
+                        
+                        const [y, m, d] = o.date.split('-').map(Number);
+                        const orderDate = new Date(y, m - 1, d);
+                        const diffTime = Math.abs(orderDate - today);
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                        const daysLabel = diffDays === 0 ? 'Hoje' : (diffDays === 1 ? 'Amanhã' : `Em ${diffDays} dias`);
+                        const daysClass = diffDays <= 2 ? 'text-red-500 bg-red-50' : 'text-blue-500 bg-blue-50';
+
+                        tr.innerHTML = `
+                            <td class="px-8 py-5 pl-8">
+                                <div class="flex flex-col">
+                                    <span class="font-bold text-slate-700 text-sm">${formatDate(o.date)}</span>
+                                    <span class="text-[10px] font-bold uppercase mt-1 px-2 py-0.5 rounded-md w-fit ${daysClass}">${daysLabel}</span>
+                                </div>
+                            </td>
+                            <td class="px-8 py-5">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-white border border-slate-100 text-slate-500 font-bold flex items-center justify-center text-sm shadow-sm">
+                                        ${initial}
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-slate-700 text-sm">${o.supplier}</p>
+                                        <p class="text-xs text-slate-400 mt-0.5 max-w-[200px] truncate" title="${o.product}">${o.product}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-8 py-5 text-right">
+                                <span class="text-xs font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-full">${o.sector || 'Geral'}</span>
+                            </td>
+                        `;
+                        upcomingBody.appendChild(tr);
+                    });
+                } else {
+                    document.getElementById('upcoming-empty').classList.remove('hidden');
+                }
             }
         }
 
         // --- UTILS ---
-        function saveData() {
-            localStorage.setItem('sys_orders', JSON.stringify(orders));
-            localStorage.setItem('sys_reminders', JSON.stringify(reminders));
-            updateDashboard();
-        }
-
         function formatDate(dateString) {
             if(!dateString) return '';
             const [y, m, d] = dateString.split('-');
@@ -1191,6 +1491,63 @@
                 }
             };
             window.requestAnimationFrame(step);
+        }
+
+        // --- MODAL UTILS ---
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+            if(id === 'modal-reminder') document.getElementById('form-reminder').reset();
+            if(id === 'modal-status') {
+                document.getElementById('form-status').reset();
+                document.getElementById('status-id').value = '';
+            }
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+            if (id === 'modal-delete') {
+                pendingDeleteId = null;
+                pendingDeleteType = null;
+            }
+        }
+
+        // --- NAVIGATION ---
+        function toggleSidebar() {
+            const sidebar = document.getElementById('main-sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+                setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('opacity-0');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+            }
+        }
+
+        function showPage(pageId) {
+            ['dashboard', 'orders', 'reminders', 'settings', 'status'].forEach(id => {
+                const page = document.getElementById(`page-${id}`);
+                if (page) page.classList.add('hidden');
+                
+                const navBtn = document.getElementById(`nav-${id}`);
+                if(navBtn) {
+                    if (id === pageId) {
+                        navBtn.classList.add('bg-slate-50', 'text-brand-600', 'border-brand-200');
+                        navBtn.classList.remove('text-slate-600', 'border-transparent');
+                    } else {
+                        navBtn.classList.remove('bg-slate-50', 'text-brand-600', 'border-brand-200');
+                        navBtn.classList.add('text-slate-600', 'border-transparent');
+                    }
+                }
+            });
+
+            const targetPage = document.getElementById(`page-${pageId}`);
+            if (targetPage) targetPage.classList.remove('hidden');
+            
+            if (pageId === 'dashboard') updateDashboard();
         }
 
     </script>
