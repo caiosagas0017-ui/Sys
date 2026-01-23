@@ -459,7 +459,8 @@
                     <h2 class="text-3xl font-bold text-slate-800">Cadastro de Status</h2>
                     <p class="text-slate-500 mt-1">Personalize os estados das suas ordens.</p>
                 </div>
-                <button onclick="openModal('modal-status')" class="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-xl shadow-lg shadow-slate-200 hover:shadow-xl transition-all flex items-center gap-2 font-medium">
+                <!-- CHANGED onclick to newStatus() -->
+                <button onclick="newStatus()" class="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-xl shadow-lg shadow-slate-200 hover:shadow-xl transition-all flex items-center gap-2 font-medium">
                     <i class="fa-solid fa-plus"></i> Novo Status
                 </button>
             </header>
@@ -961,6 +962,12 @@
         }
 
         // --- STATUS LOGIC ---
+        function newStatus() {
+            document.getElementById('form-status').reset();
+            document.getElementById('status-id').value = '';
+            openModal('modal-status');
+        }
+
         function saveStatus(e) {
             e.preventDefault();
             const id = document.getElementById('status-id').value;
@@ -1178,25 +1185,36 @@
 
         function saveService(e) {
             e.preventDefault();
-            const id = document.getElementById('service-id').value;
+            const idValue = document.getElementById('service-id').value;
+            
+            // Determine if updating or creating
+            // IMPORTANT: If editing, idValue is a string of numbers.
+            // Original IDs are numbers (from Date.now()).
+            // We use loose comparison or strict parsing.
             
             const serviceData = {
-                id: id ? parseInt(id) : Date.now(),
+                id: idValue ? parseInt(idValue) : Date.now(),
                 provider: document.getElementById('service-provider').value,
                 type: document.getElementById('service-type').value,
                 cost: 0, 
-                // Removed scheduledDate
                 date: document.getElementById('service-date').value,
                 status: document.getElementById('service-status').value,
                 desc: document.getElementById('service-desc').value,
                 timestamp: Date.now()
             };
 
-            if (id) {
-                const index = services.findIndex(s => s.id == id);
+            if (idValue) {
+                // Find index using numeric comparison
+                const numId = parseInt(idValue);
+                const index = services.findIndex(s => s.id === numId);
+                
                 if(index > -1) {
                     services[index] = serviceData;
                     showToast('Serviço atualizado!', 'success');
+                } else {
+                    // Fallback just in case
+                    services.push(serviceData);
+                    showToast('Novo serviço criado (fallback)!', 'info');
                 }
             } else {
                 services.push(serviceData);
@@ -1234,7 +1252,6 @@
             document.getElementById('service-id').value = service.id;
             document.getElementById('service-provider').value = service.provider;
             document.getElementById('service-type').value = service.type;
-            // Removed scheduledDate
             document.getElementById('service-date').value = service.date;
             document.getElementById('service-status').value = service.status;
             document.getElementById('service-desc').value = service.desc || '';
@@ -2162,14 +2179,7 @@
         function openModal(id) {
             document.getElementById(id).classList.remove('hidden');
             if(id === 'modal-reminder') document.getElementById('form-reminder').reset();
-            if(id === 'modal-status') {
-                document.getElementById('form-status').reset();
-                document.getElementById('status-id').value = '';
-            }
-            if(id === 'modal-service') {
-                document.getElementById('form-service').reset();
-                document.getElementById('service-id').value = '';
-            }
+            // Removed automated reset for status and service to allow editing
         }
 
         function closeModal(id) {
