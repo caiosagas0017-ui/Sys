@@ -103,7 +103,7 @@
             </form>
             
             <p id="login-error" class="text-red-500 text-sm mt-6 hidden font-medium bg-red-50 py-2 rounded-lg border border-red-100 animate-pulse">
-                <i class="fa-solid fa-circle-xmark mr-1"></i> Senha incorreta.
+                <i class="fa-solid fa-circle-xmark mr-1"></i> Senha incorreta. Tente novamente.
             </p>
             
             <p class="text-slate-300 text-xs mt-8">SysCompras v2.2 • Segurança Ativa</p>
@@ -159,6 +159,10 @@
             </button>
             <button onclick="showPage('orders'); toggleSidebar()" id="nav-orders" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-left rounded-xl transition-all duration-200 group text-slate-600 hover:bg-slate-50 border border-transparent">
                 <i class="fa-solid fa-list-check w-5 group-hover:text-brand-600 transition-colors"></i> <span class="font-medium">Ordens de Compra</span>
+            </button>
+            <!-- BOTÃO SERVIÇOS NOVO -->
+            <button onclick="showPage('services'); toggleSidebar()" id="nav-services" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-left rounded-xl transition-all duration-200 group text-slate-600 hover:bg-slate-50 border border-transparent">
+                <i class="fa-solid fa-helmet-safety w-5 group-hover:text-brand-600 transition-colors"></i> <span class="font-medium">Prestadores de Serviço</span>
             </button>
             <button onclick="showPage('reminders'); toggleSidebar()" id="nav-reminders" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-left rounded-xl transition-all duration-200 group text-slate-600 hover:bg-slate-50 border border-transparent">
                 <i class="fa-solid fa-bell w-5 group-hover:text-brand-600 transition-colors"></i> <span class="font-medium">Lembretes</span>
@@ -232,7 +236,6 @@
                 <div id="col-main" class="xl:col-span-2 space-y-8 min-h-[200px]">
                     
                     <!-- Próximas Entregas (Detailed List) -->
-                    <!-- MOVIDO PARA CIMA -->
                     <div id="widget-upcoming" class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
                         <div class="px-8 py-6 border-b border-slate-50 flex justify-between items-center">
                             <div class="flex items-center gap-3">
@@ -270,7 +273,6 @@
                     </div>
 
                     <!-- Chart Section -->
-                    <!-- MOVIDO PARA BAIXO -->
                     <div id="widget-chart" class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
                         <div class="flex justify-between items-end mb-6">
                             <div>
@@ -371,6 +373,57 @@
             </div>
         </div>
 
+        <!-- NEW: SERVICES PAGE -->
+        <div id="page-services" class="px-6 md:px-8 max-w-[1600px] mx-auto hidden fade-in">
+            <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 mt-4">
+                <div>
+                    <h2 class="text-3xl font-bold text-slate-800">Gestão de Serviços</h2>
+                    <p class="text-slate-500 mt-1">Organize os serviços realizados por prestadores.</p>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="printServices()" class="bg-white border border-slate-200 text-slate-600 hover:text-brand-600 hover:border-brand-200 px-6 py-3 rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-2 font-medium">
+                        <i class="fa-solid fa-print"></i> Imprimir
+                    </button>
+                    <button onclick="newService()" class="bg-brand-600 hover:bg-brand-700 text-white px-6 py-3 rounded-xl shadow-lg shadow-brand-500/30 hover:shadow-brand-500/50 transition-all flex items-center gap-2 font-medium">
+                        <i class="fa-solid fa-plus"></i> Novo Serviço
+                    </button>
+                </div>
+            </header>
+
+            <!-- SERVICES DASHBOARD -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8" id="services-dashboard">
+                <!-- JS Populated -->
+            </div>
+
+            <!-- Modern Filters for Services -->
+            <div class="bg-white p-2 rounded-xl border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row gap-2">
+                <div class="flex-1 relative">
+                    <i class="fa-solid fa-search absolute left-4 top-3.5 text-slate-400"></i>
+                    <input type="text" id="search-service" onkeyup="renderServices()" placeholder="Buscar prestador, tipo de serviço..." class="w-full pl-11 pr-4 py-3 rounded-lg border-none focus:ring-0 text-slate-700 placeholder-slate-400 font-medium bg-transparent">
+                </div>
+                <div class="h-auto w-px bg-slate-200 hidden md:block my-2"></div>
+                <select id="filter-service-status" onchange="renderServices()" class="p-3 px-4 rounded-lg border-none focus:ring-0 bg-transparent font-medium text-slate-600 cursor-pointer hover:bg-slate-50 transition-colors">
+                    <option value="all">Todos os Status</option>
+                    <option value="concluido">Concluído</option>
+                    <option value="pendente">Pendente</option>
+                    <option value="agendado">Agendado</option>
+                </select>
+            </div>
+
+            <!-- Service Cards Grid -->
+            <div id="services-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pb-8">
+                <!-- JS Generated -->
+            </div>
+            
+            <div id="services-empty-state" class="hidden py-16 text-center">
+                <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
+                    <i class="fa-solid fa-helmet-safety text-3xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800">Nenhum serviço encontrado</h3>
+                <p class="text-slate-500">Adicione um novo serviço para começar.</p>
+            </div>
+        </div>
+
         <!-- REMINDERS PAGE -->
         <div id="page-reminders" class="px-6 md:px-8 max-w-[1600px] mx-auto hidden fade-in">
             <header class="mb-10 flex justify-between items-center mt-4">
@@ -465,61 +518,49 @@
 
     </main>
 
-    <!-- MODAL ORDER -->
-    <div id="modal-order" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 transition-opacity">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden transform scale-100 transition-transform">
-            <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-slate-50">
-                <h3 id="modal-title" class="font-bold text-xl text-slate-800">Ordem de Compra</h3>
-                <button onclick="closeModal('modal-order')" class="w-8 h-8 rounded-full hover:bg-gray-200 flex items-center justify-center text-slate-500 transition-colors"><i class="fa-solid fa-times"></i></button>
+    <!-- MODAL SERVICE (NOVO) -->
+    <div id="modal-service" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
+            <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-brand-50">
+                <h3 id="modal-service-title" class="font-bold text-xl text-brand-900">Novo Serviço</h3>
+                <button onclick="closeModal('modal-service')" class="w-8 h-8 rounded-full hover:bg-white flex items-center justify-center text-brand-700 transition-colors"><i class="fa-solid fa-times"></i></button>
             </div>
-            <form id="form-order" onsubmit="saveOrder(event)" class="p-8 space-y-6">
-                <input type="hidden" id="order-id">
+            <form id="form-service" onsubmit="saveService(event)" class="p-8 space-y-5">
+                <input type="hidden" id="service-id">
                 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Prestador</label>
+                    <input type="text" id="service-provider" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tipo de Serviço</label>
+                    <input type="text" id="service-type" placeholder="Ex: Manutenção" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nº Ordem</label>
-                        <input type="text" id="order-num" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Data de Realização</label>
+                        <input type="date" id="service-date" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium text-slate-600">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Hora Criação</label>
-                        <input type="time" id="order-creation-time" readonly class="w-full px-4 py-3 bg-slate-100 border border-slate-200 rounded-lg text-slate-500 font-medium cursor-not-allowed">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Data Entrega</label>
-                        <input type="date" id="order-date" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium text-slate-600">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Status</label>
+                        <select id="service-status" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium appearance-none">
+                            <option value="agendado">Agendado</option>
+                            <option value="pendente">Pendente</option>
+                            <option value="concluido">Concluído</option>
+                        </select>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Fornecedor</label>
-                        <input type="text" id="order-supplier" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Setor Solicitante</label>
-                        <input type="text" id="order-sector" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium" placeholder="Ex: RH, TI, Marketing">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Produto / Serviço</label>
-                        <input type="text" id="order-product" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Situação Atual</label>
-                        <div class="relative">
-                            <select id="order-status" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium appearance-none">
-                                <!-- Filled JS -->
-                            </select>
-                            <i class="fa-solid fa-chevron-down absolute right-4 top-4 text-slate-400 text-xs pointer-events-none"></i>
-                        </div>
-                    </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Descrição</label>
+                    <textarea id="service-desc" rows="2" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium resize-none"></textarea>
                 </div>
 
                 <div class="pt-4 flex justify-end gap-3 border-t border-slate-100">
-                    <button type="button" onclick="closeModal('modal-order')" class="px-6 py-2.5 text-slate-600 hover:bg-slate-100 rounded-lg font-medium transition-colors">Cancelar</button>
-                    <button type="submit" id="btn-save-order" class="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg shadow-lg shadow-slate-200 hover:shadow-xl font-medium transition-all">Salvar Ordem</button>
+                    <button type="button" onclick="closeModal('modal-service')" class="px-6 py-2.5 text-slate-600 hover:bg-slate-100 rounded-lg font-medium transition-colors">Cancelar</button>
+                    <button type="submit" class="px-6 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg shadow-lg hover:shadow-xl font-medium transition-all">Salvar Serviço</button>
                 </div>
             </form>
         </div>
@@ -654,6 +695,7 @@
             { id: 'aguardando', label: 'Aguardando', color: 'amber', icon: 'fa-clock', isSystem: true },
             { id: 'assinatura', label: 'Assinatura', color: 'indigo', icon: 'fa-file-signature', isSystem: true }
         ];
+        let services = JSON.parse(localStorage.getItem('sys_services')) || [];
 
         let pendingDeleteId = null;
         let pendingDeleteType = null; 
@@ -665,12 +707,15 @@
             if (!Array.isArray(orders)) orders = [];
             if (!Array.isArray(reminders)) reminders = [];
             if (!Array.isArray(statuses)) statuses = [];
+            if (!Array.isArray(services)) services = [];
 
             // Initialize all views
             renderOrders();
             renderReminders();
             renderStatuses();
+            renderServices();
             updateDashboard();
+            updateServicesDashboard();
             updateDateTime();
             populateStatusSelects();
             
@@ -764,26 +809,20 @@
         }
 
         function checkDeliveries() {
-            // Check system permission just in case we want both, but rely on modal primarily for "attention"
             const hasSystemPermission = Notification.permission === "granted";
-            
             const today = new Date().toISOString().split('T')[0];
             let changed = false;
             let deliveriesToday = [];
 
             orders.forEach(o => {
-                // Check if delivery is today, not delivered, and not yet notified in this session/state
                 if (o.status !== 'entregue' && o.date === today && !o.notified) {
                     deliveriesToday.push(o);
-                    
-                    // Trigger system notification if available
                     if (hasSystemPermission) {
                         new Notification("Entrega Hoje!", {
                             body: `${o.supplier} - ${o.product}`,
                             icon: "https://cdn-icons-png.flaticon.com/512/2942/2942838.png"
                         });
                     }
-                    
                     o.notified = true; 
                     changed = true;
                 }
@@ -823,29 +862,20 @@
         // --- CLOCK & GREETING ---
         function updateDateTime() {
             const now = new Date();
-            
-            // Banner Date
             const dateOptions = { weekday: 'long', day: 'numeric', month: 'long' };
             const dateString = now.toLocaleDateString('pt-BR', dateOptions);
             const bannerDate = document.getElementById('banner-date');
             if(bannerDate) bannerDate.innerText = dateString.charAt(0).toUpperCase() + dateString.slice(1);
-
-            // Header Date
             const shortDateOptions = { day: 'numeric', month: 'numeric', year: 'numeric' };
             const headerDate = document.getElementById('header-date');
             if(headerDate) headerDate.innerText = now.toLocaleDateString('pt-BR', shortDateOptions);
-            
-            // Time
             const timeOptions = { hour: '2-digit', minute: '2-digit' };
             const headerTime = document.getElementById('header-time');
             if(headerTime) headerTime.innerText = now.toLocaleTimeString('pt-BR', timeOptions);
-
-            // Greeting
             const hour = now.getHours();
             let greeting = 'Bom dia';
             if (hour >= 12 && hour < 18) greeting = 'Boa tarde';
             else if (hour >= 18) greeting = 'Boa noite';
-            
             const welcome = document.getElementById('welcome-msg');
             if(welcome) welcome.innerText = `${greeting}, Admin`;
         }
@@ -858,7 +888,7 @@
             
             if(pass === '1234') {
                 document.getElementById('login-screen').classList.add('hidden');
-                // Mensagem de boas-vindas removida
+                // Removed toast here
             } else {
                 errorMsg.classList.remove('hidden');
                 setTimeout(() => errorMsg.classList.add('hidden'), 3000);
@@ -876,7 +906,9 @@
             localStorage.setItem('sys_orders', JSON.stringify(orders));
             localStorage.setItem('sys_reminders', JSON.stringify(reminders));
             localStorage.setItem('sys_statuses', JSON.stringify(statuses));
+            localStorage.setItem('sys_services', JSON.stringify(services));
             updateDashboard();
+            updateServicesDashboard();
         }
 
         function exportData() {
@@ -884,6 +916,7 @@
                 orders: orders,
                 reminders: reminders,
                 statuses: statuses,
+                services: services,
                 timestamp: new Date().toISOString()
             };
             const dataStr = JSON.stringify(data, null, 2);
@@ -906,11 +939,12 @@
             reader.onload = function(e) {
                 try {
                     const parsedData = JSON.parse(e.target.result);
-                    if (parsedData.orders) {
+                    if (parsedData.orders || parsedData.services) {
                         if(confirm('Isso substituirá todos os dados atuais. Deseja continuar?')) {
                             orders = parsedData.orders || [];
                             reminders = parsedData.reminders || [];
                             statuses = parsedData.statuses || statuses;
+                            services = parsedData.services || [];
                             saveData();
                             showToast('Dados restaurados com sucesso!', 'success');
                             setTimeout(() => location.reload(), 1000);
@@ -976,7 +1010,6 @@
             openModal('modal-status');
         }
 
-        // --- NOVA FUNÇÃO PARA MOVER STATUS ---
         function moveStatus(id, direction) {
             const index = statuses.findIndex(s => s.id === id);
             if (index < 0) return;
@@ -984,15 +1017,15 @@
             const newIndex = index + direction;
 
             if (newIndex >= 0 && newIndex < statuses.length) {
-                // Troca de posição
                 const temp = statuses[index];
                 statuses[index] = statuses[newIndex];
                 statuses[newIndex] = temp;
                 
                 saveData();
                 renderStatuses();
-                populateStatusSelects(); // Atualiza ordem nos selects
-                updateDashboard(); // Atualiza ordem no gráfico
+                populateStatusSelects();
+                updateDashboard();
+                showToast('Ordem atualizada.', 'info');
             }
         }
 
@@ -1006,7 +1039,6 @@
                 tr.className = "hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0";
                 const badgeClass = `bg-${s.color}-100 text-${s.color}-700`;
                 
-                // Define estado dos botões (desativar se for primeiro/último)
                 const isFirst = index === 0;
                 const isLast = index === statuses.length - 1;
                 const disableUp = isFirst ? 'opacity-30 cursor-not-allowed' : 'hover:bg-slate-100 hover:text-slate-800';
@@ -1023,16 +1055,13 @@
                     <td class="px-6 py-4 text-center text-slate-500"><i class="fa-solid ${s.icon}"></i></td>
                     <td class="px-6 py-4 text-right">
                         <div class="flex items-center justify-end gap-1">
-                            <!-- Botões de Movimento -->
                             <button onclick="moveStatus('${s.id}', -1)" class="text-slate-400 p-2 rounded transition-colors ${disableUp}" title="Mover para cima" ${isFirst ? 'disabled' : ''}>
                                 <i class="fa-solid fa-arrow-up"></i>
                             </button>
                             <button onclick="moveStatus('${s.id}', 1)" class="text-slate-400 p-2 rounded transition-colors ${disableDown} mr-2" title="Mover para baixo" ${isLast ? 'disabled' : ''}>
                                 <i class="fa-solid fa-arrow-down"></i>
                             </button>
-                            
                             <div class="h-4 w-px bg-slate-200 mx-1"></div>
-                            
                             <button onclick="editStatus('${s.id}')" class="text-blue-500 hover:bg-blue-50 p-2 rounded transition-colors" title="Editar">
                                 <i class="fa-solid fa-pen"></i>
                             </button>
@@ -1092,7 +1121,6 @@
             const id = document.getElementById('order-id').value;
             const dateInput = document.getElementById('order-date').value;
             
-            // Basic Validation
             if(!dateInput) {
                 showToast('Selecione uma data válida!', 'error');
                 return;
@@ -1135,49 +1163,507 @@
             openModal('modal-delete');
         }
 
+        // --- SERVICES LOGIC (NOVA) ---
+        function newService() {
+            document.getElementById('form-service').reset();
+            document.getElementById('service-id').value = '';
+            
+            // Auto-fill Data de Realização with today's date
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('service-date').value = today;
+            
+            document.getElementById('modal-service-title').innerText = 'Novo Serviço';
+            openModal('modal-service');
+        }
+
+        function saveService(e) {
+            e.preventDefault();
+            const id = document.getElementById('service-id').value;
+            
+            const serviceData = {
+                id: id ? parseInt(id) : Date.now(),
+                provider: document.getElementById('service-provider').value,
+                type: document.getElementById('service-type').value,
+                cost: 0, 
+                // Removed scheduledDate
+                date: document.getElementById('service-date').value,
+                status: document.getElementById('service-status').value,
+                desc: document.getElementById('service-desc').value,
+                timestamp: Date.now()
+            };
+
+            if (id) {
+                const index = services.findIndex(s => s.id == id);
+                if(index > -1) {
+                    services[index] = serviceData;
+                    showToast('Serviço atualizado!', 'success');
+                }
+            } else {
+                services.push(serviceData);
+                showToast('Serviço adicionado!', 'success');
+            }
+
+            saveData();
+            closeModal('modal-service');
+            renderServices();
+            updateServicesDashboard();
+        }
+
+        function deleteService(id) {
+            pendingDeleteId = id;
+            pendingDeleteType = 'service';
+            openModal('modal-delete');
+        }
+
+        // NOVA FUNÇÃO PARA ATUALIZAR STATUS DO SERVIÇO
+        function updateServiceStatus(id, newStatus) {
+            const index = services.findIndex(s => s.id === id);
+            if (index > -1) {
+                services[index].status = newStatus;
+                saveData();
+                renderServices(); // Re-renderiza para atualizar cores/ícones
+                updateServicesDashboard(); // Atualiza contadores
+                showToast('Status do serviço atualizado!', 'info');
+            }
+        }
+
+        function editService(id) {
+            const service = services.find(s => s.id === id);
+            if(!service) return;
+
+            document.getElementById('service-id').value = service.id;
+            document.getElementById('service-provider').value = service.provider;
+            document.getElementById('service-type').value = service.type;
+            // Removed scheduledDate
+            document.getElementById('service-date').value = service.date;
+            document.getElementById('service-status').value = service.status;
+            document.getElementById('service-desc').value = service.desc || '';
+
+            document.getElementById('modal-service-title').innerText = 'Editar Serviço';
+            openModal('modal-service');
+        }
+
+        function renderServices() {
+            const grid = document.getElementById('services-grid');
+            if(!grid) return;
+            grid.innerHTML = '';
+
+            const search = document.getElementById('search-service').value.toLowerCase();
+            const filter = document.getElementById('filter-service-status').value;
+
+            const filtered = services.filter(s => {
+                const matchesSearch = s.provider.toLowerCase().includes(search) || s.type.toLowerCase().includes(search);
+                const matchesFilter = filter === 'all' || s.status === filter;
+                return matchesSearch && matchesFilter;
+            });
+
+            const emptyState = document.getElementById('services-empty-state');
+            if(filtered.length === 0) {
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                
+                filtered.forEach(s => {
+                    let statusColor = 'bg-gray-100 text-gray-600';
+                    let statusIcon = 'fa-clock';
+                    
+                    // Logic to display relevant date
+                    let dateDisplay = '';
+                    if (s.status === 'agendado') {
+                         dateDisplay = `<span class="text-blue-600"><i class="fa-regular fa-calendar-days mr-1"></i> Agendado: ${formatDate(s.date)}</span>`;
+                    } else {
+                         dateDisplay = `<span class="text-slate-500"><i class="fa-regular fa-calendar-check mr-1"></i> Data: ${formatDate(s.date)}</span>`;
+                    }
+
+                    if(s.status === 'concluido') { statusColor = 'bg-green-100 text-green-700'; statusIcon = 'fa-check'; }
+                    if(s.status === 'pendente') { statusColor = 'bg-amber-100 text-amber-700'; statusIcon = 'fa-spinner'; }
+                    if(s.status === 'agendado') { statusColor = 'bg-blue-100 text-blue-700'; statusIcon = 'fa-calendar'; }
+
+                    // Options for the dropdown
+                    const options = [
+                        {val: 'agendado', label: 'Agendado'},
+                        {val: 'pendente', label: 'Pendente'},
+                        {val: 'concluido', label: 'Concluído'}
+                    ].map(opt => `<option value="${opt.val}" ${s.status === opt.val ? 'selected' : ''}>${opt.label}</option>`).join('');
+
+                    const card = document.createElement('div');
+                    card.className = "bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md transition-shadow group relative";
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-brand-50 text-brand-600 flex items-center justify-center font-bold text-sm">
+                                    ${s.provider.charAt(0).toUpperCase()}
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-lg">${s.provider}</h4>
+                                    <p class="text-xs font-medium mt-0.5">${dateDisplay}</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="editService(${s.id})" class="text-slate-400 hover:text-brand-600 p-1 transition-colors"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="deleteService(${s.id})" class="text-slate-400 hover:text-red-500 p-1 transition-colors"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-3 mb-4">
+                            <div>
+                                <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Serviço</p>
+                                <p class="text-sm font-medium text-slate-700">${s.type}</p>
+                            </div>
+                            ${s.desc ? `<div><p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Descrição</p><p class="text-sm text-slate-600 line-clamp-2">${s.desc}</p></div>` : ''}
+                        </div>
+
+                        <div class="flex justify-end items-center pt-4 border-t border-slate-50">
+                            <div class="relative group/select">
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                    <i class="fa-solid ${statusIcon} ${statusColor.split(' ')[1]}"></i>
+                                </div>
+                                <select onchange="updateServiceStatus(${s.id}, this.value)" 
+                                        class="appearance-none pl-9 pr-8 py-1.5 rounded-full text-xs font-bold uppercase cursor-pointer focus:outline-none transition-colors ${statusColor} hover:brightness-95">
+                                    ${options}
+                                </select>
+                                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                    <i class="fa-solid fa-chevron-down text-[10px] opacity-50"></i>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+        }
+
+        function updateServicesDashboard() {
+            const dash = document.getElementById('services-dashboard');
+            if(!dash) return;
+            dash.innerHTML = '';
+
+            // Removed totalSpent calculation
+            const completedCount = services.filter(s => s.status === 'concluido').length;
+            const pendingCount = services.filter(s => s.status !== 'concluido').length;
+
+            const cards = [
+                // Removed Total Investido card
+                { label: 'Serviços Realizados', value: completedCount, icon: 'fa-check-double', color: 'blue' },
+                { label: 'Pendentes / Agendados', value: pendingCount, icon: 'fa-clock', color: 'amber' }
+            ];
+
+            cards.forEach(c => {
+                const div = document.createElement('div');
+                div.className = "bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between";
+                div.innerHTML = `
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">${c.label}</p>
+                        <h3 class="text-2xl font-bold text-slate-800">${c.value}</h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-${c.color}-50 text-${c.color}-600 flex items-center justify-center text-xl">
+                        <i class="fa-solid ${c.icon}"></i>
+                    </div>
+                `;
+                dash.appendChild(div);
+            });
+        }
+
+        // --- PRINT SERVICES ---
+        function printServices() {
+            const search = document.getElementById('search-service').value.toLowerCase();
+            const filter = document.getElementById('filter-service-status').value;
+
+            const filtered = services.filter(s => {
+                const matchesSearch = s.provider.toLowerCase().includes(search) || s.type.toLowerCase().includes(search);
+                const matchesFilter = filter === 'all' || s.status === filter;
+                return matchesSearch && matchesFilter;
+            });
+
+            if (filtered.length === 0) {
+                showToast('Não há dados para imprimir.', 'error');
+                return;
+            }
+
+            const printWindow = window.open('', '', 'height=800,width=1000');
+            const now = new Date().toLocaleString('pt-BR');
+            
+            // Calculando totais para o resumo
+            const total = filtered.length;
+            const concluidos = filtered.filter(s => s.status === 'concluido').length;
+            const pendentes = filtered.filter(s => s.status !== 'concluido').length;
+
+            const htmlContent = `
+                <!DOCTYPE html>
+                <html lang="pt-BR">
+                <head>
+                    <title>Relatório de Serviços - SysCompras</title>
+                    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+                    <style>
+                        @media print {
+                            @page { margin: 1cm; size: A4; }
+                            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                        }
+                        
+                        body {
+                            font-family: 'Inter', sans-serif;
+                            color: #1e293b;
+                            line-height: 1.5;
+                            margin: 0;
+                            padding: 2rem;
+                            background: #fff;
+                        }
+
+                        .header {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            margin-bottom: 3rem;
+                            padding-bottom: 1.5rem;
+                            border-bottom: 2px solid #f1f5f9;
+                        }
+
+                        .brand {
+                            display: flex;
+                            align-items: center;
+                            gap: 0.75rem;
+                        }
+
+                        .brand-icon {
+                            width: 40px;
+                            height: 40px;
+                            background-color: #0ea5e9;
+                            color: white;
+                            border-radius: 8px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 1.25rem;
+                            font-weight: bold;
+                            /* FontAwesome replacement for simple text S */
+                            font-family: sans-serif; 
+                        }
+
+                        .brand-name {
+                            font-size: 1.25rem;
+                            font-weight: 700;
+                            color: #0f172a;
+                            letter-spacing: -0.025em;
+                        }
+
+                        .report-info {
+                            text-align: right;
+                        }
+
+                        .report-title {
+                            font-size: 0.875rem;
+                            text-transform: uppercase;
+                            letter-spacing: 0.05em;
+                            color: #64748b;
+                            font-weight: 600;
+                            margin: 0 0 0.25rem 0;
+                        }
+
+                        .report-date {
+                            font-size: 0.875rem;
+                            color: #0f172a;
+                            font-weight: 500;
+                        }
+
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-bottom: 2rem;
+                        }
+
+                        th {
+                            text-align: left;
+                            font-size: 0.75rem;
+                            text-transform: uppercase;
+                            letter-spacing: 0.05em;
+                            font-weight: 600;
+                            color: #64748b;
+                            padding: 0.75rem 1rem;
+                            background-color: #f8fafc;
+                            border-bottom: 1px solid #e2e8f0;
+                        }
+
+                        td {
+                            padding: 1rem;
+                            font-size: 0.875rem;
+                            border-bottom: 1px solid #f1f5f9;
+                            vertical-align: top;
+                        }
+
+                        tr:last-child td {
+                            border-bottom: none;
+                        }
+
+                        .provider {
+                            font-weight: 600;
+                            color: #0f172a;
+                            display: block;
+                            margin-bottom: 0.125rem;
+                        }
+                        
+                        .service-type {
+                            color: #64748b;
+                            font-size: 0.8rem;
+                        }
+
+                        .badge {
+                            display: inline-block;
+                            padding: 0.25rem 0.75rem;
+                            border-radius: 9999px;
+                            font-size: 0.7rem;
+                            font-weight: 600;
+                            text-transform: uppercase;
+                            letter-spacing: 0.025em;
+                        }
+
+                        .badge-concluido { background-color: #dcfce7; color: #166534; }
+                        .badge-pendente { background-color: #fef3c7; color: #92400e; }
+                        .badge-agendado { background-color: #dbeafe; color: #1e40af; }
+
+                        .footer {
+                            margin-top: 4rem;
+                            padding-top: 1rem;
+                            border-top: 1px solid #f1f5f9;
+                            display: flex;
+                            justify-content: space-between;
+                            font-size: 0.75rem;
+                            color: #94a3b8;
+                        }
+                        
+                        .summary {
+                            display: flex;
+                            gap: 3rem;
+                            margin-top: 2rem;
+                            padding: 1.5rem;
+                            background-color: #f8fafc;
+                            border-radius: 0.75rem;
+                            border: 1px solid #f1f5f9;
+                        }
+                        
+                        .summary-item label {
+                            display: block;
+                            font-size: 0.7rem;
+                            text-transform: uppercase;
+                            font-weight: 600;
+                            letter-spacing: 0.05em;
+                            color: #64748b;
+                            margin-bottom: 0.25rem;
+                        }
+                        
+                        .summary-item value {
+                            display: block;
+                            font-size: 1.25rem;
+                            font-weight: 700;
+                            color: #0f172a;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <div class="brand">
+                            <div class="brand-icon">S</div>
+                            <div class="brand-name">SysCompras Pro</div>
+                        </div>
+                        <div class="report-info">
+                            <h1 class="report-title">Relatório de Serviços</h1>
+                            <div class="report-date">${now}</div>
+                        </div>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 30%">Prestador / Serviço</th>
+                                <th style="width: 15%">Data Realização</th>
+                                <th style="width: 15%">Status</th>
+                                <th style="width: 40%">Descrição</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${filtered.map(s => `
+                                <tr>
+                                    <td>
+                                        <span class="provider">${s.provider}</span>
+                                        <span class="service-type">${s.type}</span>
+                                    </td>
+                                    <td>${formatDate(s.date)}</td>
+                                    <td><span class="badge badge-${s.status}">${s.status}</span></td>
+                                    <td style="color: #475569;">${s.desc || '-'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+
+                    <div class="summary">
+                        <div class="summary-item">
+                            <label>Total de Registros</label>
+                            <value>${total}</value>
+                        </div>
+                        <div class="summary-item">
+                            <label>Concluídos</label>
+                            <value>${concluidos}</value>
+                        </div>
+                         <div class="summary-item">
+                            <label>Pendentes/Agendados</label>
+                            <value>${pendentes}</value>
+                        </div>
+                    </div>
+
+                    <div class="footer">
+                        <span>Documento gerado automaticamente pelo sistema.</span>
+                        <span>Página 1 de 1</span>
+                    </div>
+
+                    <script>
+                        // Auto print when loaded
+                        window.onload = function() { 
+                            setTimeout(function() { 
+                                window.print(); 
+                                // Optional: window.close(); 
+                            }, 500); 
+                        }
+                    <\/script>
+                </body>
+                </html>
+            `;
+
+            printWindow.document.write(htmlContent);
+            printWindow.document.close();
+        }
+
+        // --- GENERIC CONFIRM DELETE ---
         function confirmDelete() {
             if (pendingDeleteId) {
                 if(pendingDeleteType === 'order') {
                     orders = orders.filter(o => o.id !== pendingDeleteId);
                     showToast('Ordem excluída.', 'success');
+                    renderOrders();
+                    updateDashboard();
                 } else if (pendingDeleteType === 'reminder') {
                     reminders = reminders.filter(r => r.id !== pendingDeleteId);
                     showToast('Lembrete removido.', 'success');
+                    renderReminders();
+                    updateDashboard();
                 } else if (pendingDeleteType === 'status') {
                     statuses = statuses.filter(s => s.id !== pendingDeleteId);
                     populateStatusSelects();
                     renderStatuses();
+                    updateDashboard();
                     showToast('Status excluído.', 'success');
+                } else if (pendingDeleteType === 'service') {
+                    services = services.filter(s => s.id !== pendingDeleteId);
+                    renderServices();
+                    updateServicesDashboard();
+                    showToast('Serviço excluído.', 'success');
                 }
                 saveData();
-                renderOrders();
-                renderReminders();
-                updateDashboard();
                 pendingDeleteId = null;
                 pendingDeleteType = null;
             }
             closeModal('modal-delete');
         }
 
-        function editOrder(id) {
-            const order = orders.find(o => o.id === id);
-            if (!order) return;
-
-            document.getElementById('order-id').value = order.id;
-            document.getElementById('order-num').value = order.number;
-            document.getElementById('order-creation-time').value = order.creationTime || ''; 
-            document.getElementById('order-supplier').value = order.supplier;
-            document.getElementById('order-sector').value = order.sector || ''; 
-            document.getElementById('order-product').value = order.product;
-            document.getElementById('order-date').value = order.date;
-            document.getElementById('order-status').value = order.status;
-
-            document.getElementById('modal-title').innerText = 'Editar Ordem';
-            document.getElementById('btn-save-order').innerText = 'Atualizar';
-
-            openModal('modal-order');
-        }
-
+        // --- FILTER & UTILS ---
         function filterOrders() {
             renderOrders();
         }
@@ -1680,6 +2166,10 @@
                 document.getElementById('form-status').reset();
                 document.getElementById('status-id').value = '';
             }
+            if(id === 'modal-service') {
+                document.getElementById('form-service').reset();
+                document.getElementById('service-id').value = '';
+            }
         }
 
         function closeModal(id) {
@@ -1707,7 +2197,7 @@
         }
 
         function showPage(pageId) {
-            ['dashboard', 'orders', 'reminders', 'settings', 'status'].forEach(id => {
+            ['dashboard', 'orders', 'reminders', 'settings', 'status', 'services'].forEach(id => {
                 const page = document.getElementById(`page-${id}`);
                 if (page) page.classList.add('hidden');
                 
