@@ -77,12 +77,10 @@
 </head>
 <body class="bg-slate-50 text-slate-600 h-screen flex flex-col overflow-hidden">
 
-    <!-- TOAST CONTAINER (MENSAGENS DE ERRO/SUCESSO) -->
-    <div id="toast-container" class="fixed top-24 right-6 z-[70] flex flex-col gap-3 pointer-events-none">
-        <!-- JS injetará os alertas aqui -->
-    </div>
+    <!-- TOAST CONTAINER -->
+    <div id="toast-container" class="fixed top-24 right-6 z-[70] flex flex-col gap-3 pointer-events-none"></div>
 
-    <!-- TELA DE LOGIN (BLOQUEIO) -->
+    <!-- TELA DE LOGIN -->
     <div id="login-screen" class="fixed inset-0 bg-slate-900 z-[100] flex items-center justify-center p-4">
         <div class="bg-white p-8 md:p-10 rounded-3xl shadow-2xl w-full max-w-md text-center transform transition-all scale-100">
             <div class="w-20 h-20 bg-brand-50 text-brand-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-glow">
@@ -143,7 +141,7 @@
         </div>
     </header>
 
-    <!-- Sidebar (Gaveta Deslizante) -->
+    <!-- Sidebar -->
     <aside id="main-sidebar" class="fixed inset-y-0 left-0 w-72 bg-white border-r border-gray-200 z-40 transform -translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
         <div class="p-6 flex justify-between items-center border-b border-gray-100 bg-slate-50">
             <h2 class="text-lg font-bold text-slate-700 tracking-tight">Navegação</h2>
@@ -160,7 +158,7 @@
             <button onclick="showPage('orders'); toggleSidebar()" id="nav-orders" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-left rounded-xl transition-all duration-200 group text-slate-600 hover:bg-slate-50 border border-transparent">
                 <i class="fa-solid fa-list-check w-5 group-hover:text-brand-600 transition-colors"></i> <span class="font-medium">Ordens de Compra</span>
             </button>
-            <!-- BOTÃO SERVIÇOS NOVO -->
+            <!-- BOTÃO SERVIÇOS -->
             <button onclick="showPage('services'); toggleSidebar()" id="nav-services" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-left rounded-xl transition-all duration-200 group text-slate-600 hover:bg-slate-50 border border-transparent">
                 <i class="fa-solid fa-helmet-safety w-5 group-hover:text-brand-600 transition-colors"></i> <span class="font-medium">Prestadores de Serviço</span>
             </button>
@@ -197,7 +195,6 @@
         <!-- DASHBOARD PAGE -->
         <div id="page-dashboard" class="px-6 md:px-8 max-w-[1600px] mx-auto fade-in pb-12">
             
-            <!-- Welcome Banner & Quick Actions -->
             <div class="relative bg-white rounded-3xl p-8 mb-8 shadow-sm border border-slate-100 overflow-hidden group">
                 <div class="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-brand-50 to-brand-100 rounded-full blur-3xl opacity-50 -mr-16 -mt-16 pointer-events-none"></div>
                 
@@ -232,10 +229,10 @@
             <!-- Main Complex Grid -->
             <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
                 
-                <!-- Coluna Esquerda (Principal) -->
+                <!-- Coluna Esquerda -->
                 <div id="col-main" class="xl:col-span-2 space-y-8 min-h-[200px]">
                     
-                    <!-- Próximas Entregas (Detailed List) -->
+                    <!-- Próximas Entregas -->
                     <div id="widget-upcoming" class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
                         <div class="px-8 py-6 border-b border-slate-50 flex justify-between items-center">
                             <div class="flex items-center gap-3">
@@ -280,7 +277,6 @@
                                 <p class="text-sm text-slate-400">Visualização gráfica do status das ordens.</p>
                             </div>
                         </div>
-                        <!-- Container com altura fixa para o gráfico -->
                         <div class="w-full h-80 relative">
                             <canvas id="statusChart"></canvas>
                         </div>
@@ -288,7 +284,7 @@
 
                 </div>
 
-                <!-- Coluna Direita (Lateral) -->
+                <!-- Coluna Direita -->
                 <div id="col-side" class="space-y-8 min-h-[200px]">
                     
                     <!-- Lembretes Widget -->
@@ -327,7 +323,6 @@
                 </button>
             </header>
 
-            <!-- Modern Filters -->
             <div class="bg-white p-2 rounded-xl border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row gap-2">
                 <div class="flex-1 relative">
                     <i class="fa-solid fa-search absolute left-4 top-3.5 text-slate-400"></i>
@@ -339,7 +334,6 @@
                 </select>
             </div>
 
-            <!-- Desktop View (Table) -->
             <div class="hidden md:block overflow-x-auto pb-4">
                 <table class="w-full table-spacing">
                     <thead>
@@ -359,7 +353,6 @@
                 </table>
             </div>
 
-            <!-- Mobile View (Cards) -->
             <div class="md:hidden grid grid-cols-1 gap-4 pb-4" id="orders-mobile-grid">
                 <!-- JS Generated -->
             </div>
@@ -390,20 +383,16 @@
                 </div>
             </header>
 
-            <!-- SERVICES DASHBOARD -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8" id="services-dashboard">
                 <!-- JS Populated -->
             </div>
 
-            <!-- Modern Filters for Services -->
             <div class="bg-white p-2 rounded-xl border border-slate-200 shadow-sm mb-6 flex flex-col md:flex-row gap-2">
                 <div class="flex-1 relative">
                     <i class="fa-solid fa-search absolute left-4 top-3.5 text-slate-400"></i>
                     <input type="text" id="search-service" onkeyup="renderServices()" placeholder="Buscar prestador, tipo de serviço..." class="w-full pl-11 pr-4 py-3 rounded-lg border-none focus:ring-0 text-slate-700 placeholder-slate-400 font-medium bg-transparent">
                 </div>
-                <div class="h-auto w-px bg-slate-200 hidden md:block my-2"></div>
-                <input type="date" id="filter-service-date" onchange="renderServices()" class="p-3 px-4 rounded-lg border-none focus:ring-0 bg-transparent font-medium text-slate-600 cursor-pointer hover:bg-slate-50 transition-colors">
-                
+                <!-- Removed Date Filter from main screen -->
                 <div class="h-auto w-px bg-slate-200 hidden md:block my-2"></div>
                 <select id="filter-service-status" onchange="renderServices()" class="p-3 px-4 rounded-lg border-none focus:ring-0 bg-transparent font-medium text-slate-600 cursor-pointer hover:bg-slate-50 transition-colors">
                     <option value="all">Todos os Status</option>
@@ -413,7 +402,6 @@
                 </select>
             </div>
 
-            <!-- Service Cards Grid -->
             <div id="services-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pb-8">
                 <!-- JS Generated -->
             </div>
@@ -455,14 +443,13 @@
             </div>
         </div>
 
-        <!-- STATUS PAGE (NOVO) -->
+        <!-- STATUS PAGE -->
         <div id="page-status" class="px-6 md:px-8 max-w-[1600px] mx-auto hidden fade-in">
             <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 mt-4">
                 <div>
                     <h2 class="text-3xl font-bold text-slate-800">Cadastro de Status</h2>
                     <p class="text-slate-500 mt-1">Personalize os estados das suas ordens.</p>
                 </div>
-                <!-- CHANGED onclick to newStatus() -->
                 <button onclick="newStatus()" class="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-xl shadow-lg shadow-slate-200 hover:shadow-xl transition-all flex items-center gap-2 font-medium">
                     <i class="fa-solid fa-plus"></i> Novo Status
                 </button>
@@ -522,7 +509,67 @@
 
     </main>
 
-    <!-- MODAL SERVICE (NOVO) -->
+    <!-- MODAL ORDER -->
+    <div id="modal-order" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden transform scale-100 transition-transform">
+            <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-slate-50">
+                <h3 id="modal-title" class="font-bold text-xl text-slate-800">Ordem de Compra</h3>
+                <button onclick="closeModal('modal-order')" class="w-8 h-8 rounded-full hover:bg-gray-200 flex items-center justify-center text-slate-500 transition-colors"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <form id="form-order" onsubmit="saveOrder(event)" class="p-8 space-y-6">
+                <input type="hidden" id="order-id">
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Nº Ordem</label>
+                        <input type="text" id="order-num" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Hora Criação</label>
+                        <input type="time" id="order-creation-time" readonly class="w-full px-4 py-3 bg-slate-100 border border-slate-200 rounded-lg text-slate-500 font-medium cursor-not-allowed">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Data Entrega</label>
+                        <input type="date" id="order-date" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium text-slate-600">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Fornecedor</label>
+                        <input type="text" id="order-supplier" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Setor Solicitante</label>
+                        <input type="text" id="order-sector" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium" placeholder="Ex: RH, TI, Marketing">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Produto / Serviço</label>
+                        <input type="text" id="order-product" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Situação Atual</label>
+                        <div class="relative">
+                            <select id="order-status" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium appearance-none">
+                                <!-- Filled JS -->
+                            </select>
+                            <i class="fa-solid fa-chevron-down absolute right-4 top-4 text-slate-400 text-xs pointer-events-none"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4 flex justify-end gap-3 border-t border-slate-100">
+                    <button type="button" onclick="closeModal('modal-order')" class="px-6 py-2.5 text-slate-600 hover:bg-slate-100 rounded-lg font-medium transition-colors">Cancelar</button>
+                    <button type="submit" id="btn-save-order" class="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg shadow-lg shadow-slate-200 hover:shadow-xl font-medium transition-all">Salvar Ordem</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL SERVICE -->
     <div id="modal-service" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 transition-opacity">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
             <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-brand-50">
@@ -1196,6 +1243,11 @@
             e.preventDefault();
             const idValue = document.getElementById('service-id').value;
             
+            // Determine if updating or creating
+            // IMPORTANT: If editing, idValue is a string of numbers.
+            // Original IDs are numbers (from Date.now()).
+            // We use loose comparison or strict parsing.
+            
             const serviceData = {
                 id: idValue ? parseInt(idValue) : Date.now(),
                 provider: document.getElementById('service-provider').value,
@@ -1216,6 +1268,7 @@
                     services[index] = serviceData;
                     showToast('Serviço atualizado!', 'success');
                 } else {
+                    // Fallback just in case
                     services.push(serviceData);
                     showToast('Novo serviço criado (fallback)!', 'info');
                 }
@@ -1271,15 +1324,13 @@
 
             const search = document.getElementById('search-service').value.toLowerCase();
             const filter = document.getElementById('filter-service-status').value;
-            const filterDate = document.getElementById('filter-service-date').value;
+            // Removed date filter variable
 
             const filtered = services.filter(s => {
                 const matchesSearch = s.provider.toLowerCase().includes(search) || s.type.toLowerCase().includes(search);
                 const matchesFilter = filter === 'all' || s.status === filter;
-                // Filter by Service Date (Data de Realização)
-                const matchesDate = !filterDate || s.date === filterDate;
-                
-                return matchesSearch && matchesFilter && matchesDate;
+                // Removed date match logic for screen rendering
+                return matchesSearch && matchesFilter;
             });
 
             const emptyState = document.getElementById('services-empty-state');
@@ -1292,6 +1343,7 @@
                     let statusColor = 'bg-gray-100 text-gray-600';
                     let statusIcon = 'fa-clock';
                     
+                    // Logic to display relevant date
                     let dateDisplay = '';
                     if (s.status === 'agendado') {
                          dateDisplay = `<span class="text-blue-600"><i class="fa-regular fa-calendar-days mr-1"></i> Agendado: ${formatDate(s.date)}</span>`;
@@ -1303,6 +1355,7 @@
                     if(s.status === 'pendente') { statusColor = 'bg-amber-100 text-amber-700'; statusIcon = 'fa-spinner'; }
                     if(s.status === 'agendado') { statusColor = 'bg-blue-100 text-blue-700'; statusIcon = 'fa-calendar'; }
 
+                    // Options for the dropdown
                     const options = [
                         {val: 'agendado', label: 'Agendado'},
                         {val: 'pendente', label: 'Pendente'},
@@ -1328,12 +1381,16 @@
                             </div>
                         </div>
                         
-                        <div class="space-y-3 mb-4">
-                            <div>
+                        <div class="mb-4">
+                            <div class="mb-3">
                                 <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Serviço</p>
                                 <p class="text-sm font-medium text-slate-700">${s.type}</p>
                             </div>
-                            ${s.desc ? `<div><p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Descrição</p><p class="text-sm text-slate-600 line-clamp-2">${s.desc}</p></div>` : ''}
+                            ${s.desc ? `
+                            <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1"><i class="fa-regular fa-file-lines mr-1"></i>Descrição</p>
+                                <p class="text-sm text-slate-600 italic leading-relaxed">${s.desc}</p>
+                            </div>` : ''}
                         </div>
 
                         <div class="flex justify-end items-center pt-4 border-t border-slate-50">
@@ -1361,10 +1418,12 @@
             if(!dash) return;
             dash.innerHTML = '';
 
+            // Removed totalSpent calculation
             const completedCount = services.filter(s => s.status === 'concluido').length;
             const pendingCount = services.filter(s => s.status !== 'concluido').length;
 
             const cards = [
+                // Removed Total Investido card
                 { label: 'Serviços Realizados', value: completedCount, icon: 'fa-check-double', color: 'blue' },
                 { label: 'Pendentes / Agendados', value: pendingCount, icon: 'fa-clock', color: 'amber' }
             ];
@@ -1389,24 +1448,39 @@
         function printServices() {
             const search = document.getElementById('search-service').value.toLowerCase();
             const filter = document.getElementById('filter-service-status').value;
-            const filterDate = document.getElementById('filter-service-date').value;
+            
+            // Ask for date
+            const today = new Date();
+            const todayStr = today.getDate().toString().padStart(2, '0') + '/' + (today.getMonth() + 1).toString().padStart(2, '0') + '/' + today.getFullYear();
+            const datePrompt = prompt("Digite a data para o relatório (DD/MM/AAAA):", todayStr);
+
+            if (datePrompt === null) return; // User cancelled
+
+            // Convert DD/MM/YYYY to YYYY-MM-DD for comparison
+            let filterDate = '';
+            if (datePrompt.trim() !== '') {
+                const parts = datePrompt.split('/');
+                if (parts.length === 3) {
+                    filterDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                }
+            }
 
             const filtered = services.filter(s => {
                 const matchesSearch = s.provider.toLowerCase().includes(search) || s.type.toLowerCase().includes(search);
                 const matchesFilter = filter === 'all' || s.status === filter;
-                const matchesDate = !filterDate || s.date === filterDate;
+                const matchesDate = filterDate ? s.date === filterDate : true;
                 return matchesSearch && matchesFilter && matchesDate;
             });
 
             if (filtered.length === 0) {
-                showToast('Não há dados para imprimir com os filtros atuais.', 'error');
+                showToast('Nenhum serviço encontrado para esta data.', 'error');
                 return;
             }
 
             const printWindow = window.open('', '', 'height=800,width=1000');
             const now = new Date().toLocaleString('pt-BR');
-            const dateLabel = filterDate ? formatDate(filterDate) : 'Todas';
             
+            // Calculando totais para o resumo
             const total = filtered.length;
             const concluidos = filtered.filter(s => s.status === 'concluido').length;
             const pendentes = filtered.filter(s => s.status !== 'concluido').length;
@@ -1458,6 +1532,7 @@
                             justify-content: center;
                             font-size: 1.25rem;
                             font-weight: bold;
+                            /* FontAwesome replacement for simple text S */
                             font-family: sans-serif; 
                         }
 
@@ -1598,7 +1673,7 @@
                         </div>
                         <div class="report-info">
                             <h1 class="report-title">Relatório de Serviços</h1>
-                            <div class="report-date">Data do Filtro: ${dateLabel}</div>
+                            <div class="report-date">Data do Filtro: ${datePrompt || 'Todas'}</div>
                             <div class="report-date">Emitido em: ${now}</div>
                         </div>
                     </div>
