@@ -402,6 +402,9 @@
                     <input type="text" id="search-service" onkeyup="renderServices()" placeholder="Buscar prestador, tipo de serviço..." class="w-full pl-11 pr-4 py-3 rounded-lg border-none focus:ring-0 text-slate-700 placeholder-slate-400 font-medium bg-transparent">
                 </div>
                 <div class="h-auto w-px bg-slate-200 hidden md:block my-2"></div>
+                <input type="date" id="filter-service-date" onchange="renderServices()" class="p-3 px-4 rounded-lg border-none focus:ring-0 bg-transparent font-medium text-slate-600 cursor-pointer hover:bg-slate-50 transition-colors">
+                
+                <div class="h-auto w-px bg-slate-200 hidden md:block my-2"></div>
                 <select id="filter-service-status" onchange="renderServices()" class="p-3 px-4 rounded-lg border-none focus:ring-0 bg-transparent font-medium text-slate-600 cursor-pointer hover:bg-slate-50 transition-colors">
                     <option value="all">Todos os Status</option>
                     <option value="concluido">Concluído</option>
@@ -545,13 +548,18 @@
                         <input type="date" id="service-date" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium text-slate-600">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Status</label>
-                        <select id="service-status" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium appearance-none">
-                            <option value="agendado">Agendado</option>
-                            <option value="pendente">Pendente</option>
-                            <option value="concluido">Concluído</option>
-                        </select>
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Data do Relatório</label>
+                        <input type="date" id="service-report-date" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium text-slate-600">
                     </div>
+                </div>
+                
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Status</label>
+                    <select id="service-status" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg focus:bg-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all font-medium appearance-none">
+                        <option value="agendado">Agendado</option>
+                        <option value="pendente">Pendente</option>
+                        <option value="concluido">Concluído</option>
+                    </select>
                 </div>
 
                 <div>
@@ -1175,9 +1183,10 @@
             document.getElementById('form-service').reset();
             document.getElementById('service-id').value = '';
             
-            // Auto-fill Data de Realização with today's date
+            // Auto-fill dates with today's date
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('service-date').value = today;
+            document.getElementById('service-report-date').value = today;
             
             document.getElementById('modal-service-title').innerText = 'Novo Serviço';
             openModal('modal-service');
@@ -1187,24 +1196,19 @@
             e.preventDefault();
             const idValue = document.getElementById('service-id').value;
             
-            // Determine if updating or creating
-            // IMPORTANT: If editing, idValue is a string of numbers.
-            // Original IDs are numbers (from Date.now()).
-            // We use loose comparison or strict parsing.
-            
             const serviceData = {
                 id: idValue ? parseInt(idValue) : Date.now(),
                 provider: document.getElementById('service-provider').value,
                 type: document.getElementById('service-type').value,
                 cost: 0, 
                 date: document.getElementById('service-date').value,
+                reportDate: document.getElementById('service-report-date').value,
                 status: document.getElementById('service-status').value,
                 desc: document.getElementById('service-desc').value,
                 timestamp: Date.now()
             };
 
             if (idValue) {
-                // Find index using numeric comparison
                 const numId = parseInt(idValue);
                 const index = services.findIndex(s => s.id === numId);
                 
@@ -1212,7 +1216,6 @@
                     services[index] = serviceData;
                     showToast('Serviço atualizado!', 'success');
                 } else {
-                    // Fallback just in case
                     services.push(serviceData);
                     showToast('Novo serviço criado (fallback)!', 'info');
                 }
@@ -1239,8 +1242,8 @@
             if (index > -1) {
                 services[index].status = newStatus;
                 saveData();
-                renderServices(); // Re-renderiza para atualizar cores/ícones
-                updateServicesDashboard(); // Atualiza contadores
+                renderServices(); 
+                updateServicesDashboard(); 
                 showToast('Status do serviço atualizado!', 'info');
             }
         }
@@ -1253,6 +1256,7 @@
             document.getElementById('service-provider').value = service.provider;
             document.getElementById('service-type').value = service.type;
             document.getElementById('service-date').value = service.date;
+            document.getElementById('service-report-date').value = service.reportDate || service.date; // Fallback
             document.getElementById('service-status').value = service.status;
             document.getElementById('service-desc').value = service.desc || '';
 
@@ -1267,11 +1271,15 @@
 
             const search = document.getElementById('search-service').value.toLowerCase();
             const filter = document.getElementById('filter-service-status').value;
+            const filterDate = document.getElementById('filter-service-date').value;
 
             const filtered = services.filter(s => {
                 const matchesSearch = s.provider.toLowerCase().includes(search) || s.type.toLowerCase().includes(search);
                 const matchesFilter = filter === 'all' || s.status === filter;
-                return matchesSearch && matchesFilter;
+                // Filter by Service Date (Data de Realização)
+                const matchesDate = !filterDate || s.date === filterDate;
+                
+                return matchesSearch && matchesFilter && matchesDate;
             });
 
             const emptyState = document.getElementById('services-empty-state');
@@ -1284,7 +1292,6 @@
                     let statusColor = 'bg-gray-100 text-gray-600';
                     let statusIcon = 'fa-clock';
                     
-                    // Logic to display relevant date
                     let dateDisplay = '';
                     if (s.status === 'agendado') {
                          dateDisplay = `<span class="text-blue-600"><i class="fa-regular fa-calendar-days mr-1"></i> Agendado: ${formatDate(s.date)}</span>`;
@@ -1296,7 +1303,6 @@
                     if(s.status === 'pendente') { statusColor = 'bg-amber-100 text-amber-700'; statusIcon = 'fa-spinner'; }
                     if(s.status === 'agendado') { statusColor = 'bg-blue-100 text-blue-700'; statusIcon = 'fa-calendar'; }
 
-                    // Options for the dropdown
                     const options = [
                         {val: 'agendado', label: 'Agendado'},
                         {val: 'pendente', label: 'Pendente'},
@@ -1355,12 +1361,10 @@
             if(!dash) return;
             dash.innerHTML = '';
 
-            // Removed totalSpent calculation
             const completedCount = services.filter(s => s.status === 'concluido').length;
             const pendingCount = services.filter(s => s.status !== 'concluido').length;
 
             const cards = [
-                // Removed Total Investido card
                 { label: 'Serviços Realizados', value: completedCount, icon: 'fa-check-double', color: 'blue' },
                 { label: 'Pendentes / Agendados', value: pendingCount, icon: 'fa-clock', color: 'amber' }
             ];
@@ -1385,22 +1389,24 @@
         function printServices() {
             const search = document.getElementById('search-service').value.toLowerCase();
             const filter = document.getElementById('filter-service-status').value;
+            const filterDate = document.getElementById('filter-service-date').value;
 
             const filtered = services.filter(s => {
                 const matchesSearch = s.provider.toLowerCase().includes(search) || s.type.toLowerCase().includes(search);
                 const matchesFilter = filter === 'all' || s.status === filter;
-                return matchesSearch && matchesFilter;
+                const matchesDate = !filterDate || s.date === filterDate;
+                return matchesSearch && matchesFilter && matchesDate;
             });
 
             if (filtered.length === 0) {
-                showToast('Não há dados para imprimir.', 'error');
+                showToast('Não há dados para imprimir com os filtros atuais.', 'error');
                 return;
             }
 
             const printWindow = window.open('', '', 'height=800,width=1000');
             const now = new Date().toLocaleString('pt-BR');
+            const dateLabel = filterDate ? formatDate(filterDate) : 'Todas';
             
-            // Calculando totais para o resumo
             const total = filtered.length;
             const concluidos = filtered.filter(s => s.status === 'concluido').length;
             const pendentes = filtered.filter(s => s.status !== 'concluido').length;
@@ -1452,7 +1458,6 @@
                             justify-content: center;
                             font-size: 1.25rem;
                             font-weight: bold;
-                            /* FontAwesome replacement for simple text S */
                             font-family: sans-serif; 
                         }
 
@@ -1480,6 +1485,16 @@
                             font-size: 0.875rem;
                             color: #0f172a;
                             font-weight: 500;
+                        }
+
+                        .filter-context {
+                            font-size: 0.75rem;
+                            color: #64748b;
+                            margin-bottom: 1.5rem;
+                            padding: 0.75rem;
+                            background-color: #f8fafc;
+                            border-radius: 0.5rem;
+                            border: 1px solid #e2e8f0;
                         }
 
                         table {
@@ -1583,9 +1598,12 @@
                         </div>
                         <div class="report-info">
                             <h1 class="report-title">Relatório de Serviços</h1>
-                            <div class="report-date">${now}</div>
+                            <div class="report-date">Data do Filtro: ${dateLabel}</div>
+                            <div class="report-date">Emitido em: ${now}</div>
                         </div>
                     </div>
+
+                    ${filter !== 'all' ? `<div class="filter-context">Filtro aplicado: Status <strong>${filter.toUpperCase()}</strong></div>` : ''}
 
                     <table>
                         <thead>
